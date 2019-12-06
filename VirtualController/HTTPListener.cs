@@ -166,7 +166,7 @@ namespace VirtualController
                                 {
 
                                   int time = Convert.ToInt32(BodyCol.Get("time"));
-                                  int duration = Convert.ToInt32(BodyCol.Get("time"));
+                                  int duration = Convert.ToInt32(BodyCol.Get("duration"));
                                   VR.CreateSession(VR.id, time , duration, "created");
 
                                   SimpleResponse(context, "Session Created\n id = " + VR.VS.id + " time = " + VR.VS.time + " duration = " + VR.VS.duration);

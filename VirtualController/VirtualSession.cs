@@ -27,9 +27,19 @@ namespace VirtualController
             Random Random = new Random();
 
             double SleepTime = duration * 0.9 + duration * (Random.Next(1000) * 0.002 - 0.1 );
-            this.status = "working";
-            Thread.Sleep(Convert.ToInt32(SleepTime * 1000));
-            this.status = "finished";
+
+
+
+           // this.status = "working";
+            Thread sleep = new Thread(() => {
+                this.status = "working";
+                Thread.Sleep(Convert.ToInt32(SleepTime * 10));
+                this.status = "finished";
+            });
+            sleep.Start();
+       //     sleep.Join();
+
+            
         }
     }
 }
