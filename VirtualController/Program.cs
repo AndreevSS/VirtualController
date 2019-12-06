@@ -1,17 +1,5 @@
 ﻿using System;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
-using System.Threading;
+
 
 namespace VirtualController
 {
@@ -19,12 +7,17 @@ namespace VirtualController
     {
         static void Main(string[] args)
         {
+            int VirtualController_Port = 8800;
+            int VirtualRobots_Port = 8900;
+            int VirtualRobots_Count = 5;
+
+
             Console.WriteLine("Hello World!");
 
             VirtualController VC = new VirtualController();
 
-            VC.CreateController(8800, 8900);
-    //      VC.CreateRobots(50);
+            VC.CreateController(VirtualController_Port, VirtualRobots_Port);
+            VC.CreateRobots(VirtualRobots_Count);
     //      VC.CreateRobots(20);
     //      VC.GetValues();
 

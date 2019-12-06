@@ -1,25 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 using System.Threading;
-
+using System.Web;
 
 namespace VirtualController
 {
     class HTTPListener
     {
+
+        public static NameValueCollection KeysAndValuesFromBody(Stream stream)
+        {
+
+            NameValueCollection BodyCol = new NameValueCollection();
+            String BodyString = ToString(stream);
+            BodyCol = HttpUtility.ParseQueryString(BodyString);
+            return BodyCol;
+        }
 
         static void SimpleResponse(HttpListenerContext context, String Answer)
         {
@@ -48,7 +46,7 @@ namespace VirtualController
         public static String ToString(Stream stream)
         {
 
-            stream.Position = 0;
+     //       stream.Position = 0;
             StreamReader reader = new StreamReader(stream);
             string String = reader.ReadToEnd();
             return String;
@@ -86,7 +84,7 @@ namespace VirtualController
             listener.Start();
 
 
-            //      HttpListenerRequest request = context.Request;
+  
             //      HttpListenerResponse response = context.Response;
             Console.WriteLine(port + ":(VC) Ожидание подключений...");
 
@@ -95,15 +93,29 @@ namespace VirtualController
                     // метод GetContext блокирует текущий поток, ожидая получение запроса 
                     HttpListenerContext context = listener.GetContext();
                     ConnectionInfo(context.Request);
+                    HttpListenerRequest request = context.Request;
 
-                    switch (Path(context.Request.RawUrl))
+                    NameValueCollection BodyCol = new NameValueCollection();
+                    BodyCol = KeysAndValuesFromBody(request.InputStream);
+               
+                switch (Path(context.Request.RawUrl))
                     {
                         default: SimpleResponse(context, "I'm Virtual Controller"); break;
-                        case "/CreateRobots/": VC.CreateRobots(1); SimpleResponse(context, "CreatingRobots"); break;
-                        case "/Values/": SimpleResponse(context, VC.GetValues()); break;
+                    case "/CreateRobots/":
+                        if (Convert.ToInt32(BodyCol.Get("count")) > 0)
+                        {
+                             VC.CreateRobots(Convert.ToInt32(BodyCol.Get("count"))); SimpleResponse(context, "CreatingRobots"); break;
+                        }
+                        else
+                            SimpleResponse(context, "Wrong Value");
+                        break;
+
+                    case "/Values/": SimpleResponse(context, VC.GetValues()); break;
                     }
 
-                    Thread.Sleep(0);
+
+
+                Thread.Sleep(0);
 
                 }
             }
@@ -116,30 +128,69 @@ namespace VirtualController
                 return;
             }
 
-
             HttpListener listener = new HttpListener();
             listener.Prefixes.Add("http://localhost:" + port +"/");
             listener.Start();
 
-
-            //      HttpListenerRequest request = context.Request;
-            //      HttpListenerResponse response = context.Response;
             Console.WriteLine(port + ":(VR) Ожидание подключений...");
+
+
 
                 while (true)
                 {
                     // метод GetContext блокирует текущий поток, ожидая получение запроса 
                     HttpListenerContext context = listener.GetContext();
                     ConnectionInfo(context.Request);
+                    HttpListenerRequest request = context.Request;
+
+                    NameValueCollection BodyCol = new NameValueCollection();
+                    BodyCol = KeysAndValuesFromBody(request.InputStream);
+
 
                     switch (Path(context.Request.RawUrl))
-                    {
-                        default: SimpleResponse(context, "Nothing is found!"); break;
-                        case "/Token/": SimpleResponse(context, "Token"); break;
-                        case "/CreateSession/": SimpleResponse(context, "CreateSession"); break;
-                        case "/StartSession/": SimpleResponse(context, "StartSession"); break;
-                    case "/Values/": SimpleResponse(context, VR.GetValues()); break;
-                }
+                        {
+                            default: SimpleResponse(context, "Nothing is found!"); break;
+                            case "/Token/":
+                                if (BodyCol.Get("token") != null)
+                                {
+                                   VR.token = BodyCol.Get("token");
+                                   SimpleResponse(context, "Token is added: " + BodyCol.Get("token"));
+                                }
+                                else
+                                {
+                                   SimpleResponse(context, "Token is not added");
+                                };
+                                break;
+                            case "/CreateSession/":
+                                if ( (VR.token == BodyCol.Get("token")) && (BodyCol.Get("time") != null) && (BodyCol.Get("duration") != null) ) 
+                                {
+
+                                  int time = Convert.ToInt32(BodyCol.Get("time"));
+                                  int duration = Convert.ToInt32(BodyCol.Get("time"));
+                                  VR.CreateSession(VR.id, time , duration, "created");
+
+                                  SimpleResponse(context, "Session Created\n id = " + VR.VS.id + " time = " + VR.VS.time + " duration = " + VR.VS.duration);
+                                }
+                                else
+                                {
+                                  SimpleResponse(context, "Wrong Request");
+                                };
+                                break;
+                            case "/StartSession/": 
+                                if (!(VR.VS is null) && (VR.VS.status != "working"))
+                                    {
+                                    SimpleResponse(context, "Session " + VR.VS.id + "started");
+                                    VR.VS.Start();                              
+                                    }
+                        
+                                else
+                                    {
+                                    SimpleResponse(context, "Session not started");
+                                    }
+                        
+                                break;
+                            case "/Values/": SimpleResponse(context, VR.GetValues()); break;
+                    }
 
                     Thread.Sleep(0);
 

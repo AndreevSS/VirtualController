@@ -1,15 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 using System.Threading;
 
 
@@ -39,13 +29,13 @@ namespace VirtualController
         }
 
         public void CreateRobots(int VRCount)
+
         {
-
-            for (int i = 0; i < VRCount; i++)
+               for (int i = 0; i < VRCount; i++)
             {
-                int port = VRPortsCount + VRPorts + i;
+                int port = VRPortsCount + VRPorts;
 
-                VirtualRobot VR = new VirtualRobot(port, i, null);
+                VirtualRobot VR = new VirtualRobot(port, VRPortsCount, null);
 
                 Thread th = new Thread(() => {
                     HTTPListener.CreateListener(port, VR);

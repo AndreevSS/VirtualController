@@ -7,8 +7,9 @@ namespace VirtualController
     class VirtualRobot
     {
         int port;
-        int id;
-        string token;
+        public int id;
+        public string token;
+        public VirtualSession VS;
         public VirtualRobot(int port, int id, string token)
         {
             this.port = port;
@@ -23,6 +24,11 @@ namespace VirtualController
             Console.WriteLine("token = " + token);
 
             return "Robot ID = " + id + "\nport: " + port + "\ntoken = " + token + "";
+        }
+
+        public void CreateSession(int id, int time, int duration, string status)
+        {
+            this.VS = new VirtualSession(id, time, duration, status);
         }
     }
 }
