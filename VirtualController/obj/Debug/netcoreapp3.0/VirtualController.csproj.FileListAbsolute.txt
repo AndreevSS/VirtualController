@@ -1,0 +1,11 @@
+C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\VirtualController.exe
+C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\VirtualController.deps.json
+C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\VirtualController.runtimeconfig.json
+C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\VirtualController.runtimeconfig.dev.json
+C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\VirtualController.dll
+C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\VirtualController.pdb
+C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.csprojAssemblyReference.cache
+C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.AssemblyInfoInputs.cache
+C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.AssemblyInfo.cs
+C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.dll
+C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.pdb

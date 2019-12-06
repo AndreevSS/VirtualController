@@ -1,0 +1,65 @@
+2019-12-06 13:47:48,598 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2019-12-06 13:47:48,616 INFO o.a.j.JMeter: Loading user properties from: user.properties
+2019-12-06 13:47:48,621 INFO o.a.j.JMeter: Loading system properties from: system.properties
+2019-12-06 13:47:48,623 INFO o.a.j.JMeter: Copyright (c) 1998-2019 The Apache Software Foundation
+2019-12-06 13:47:48,623 INFO o.a.j.JMeter: Version 5.2
+2019-12-06 13:47:48,623 INFO o.a.j.JMeter: java.version=1.8.0_231
+2019-12-06 13:47:48,623 INFO o.a.j.JMeter: java.vm.name=Java HotSpot(TM) Client VM
+2019-12-06 13:47:48,623 INFO o.a.j.JMeter: os.name=Windows 10
+2019-12-06 13:47:48,623 INFO o.a.j.JMeter: os.arch=x86
+2019-12-06 13:47:48,623 INFO o.a.j.JMeter: os.version=10.0
+2019-12-06 13:47:48,623 INFO o.a.j.JMeter: file.encoding=Cp1251
+2019-12-06 13:47:48,623 INFO o.a.j.JMeter: java.awt.headless=null
+2019-12-06 13:47:48,623 INFO o.a.j.JMeter: Max memory     =1073741824
+2019-12-06 13:47:48,623 INFO o.a.j.JMeter: Available Processors =4
+2019-12-06 13:47:48,628 INFO o.a.j.JMeter: Default Locale=English (EN)
+2019-12-06 13:47:48,628 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2019-12-06 13:47:48,628 INFO o.a.j.JMeter: JMeterHome=C:\Users\student\Desktop\jmeter\apache-jmeter-5.2
+2019-12-06 13:47:48,628 INFO o.a.j.JMeter: user.dir  =C:\Users\student\Desktop\jmeter\apache-jmeter-5.2\bin
+2019-12-06 13:47:48,629 INFO o.a.j.JMeter: PWD       =C:\Users\student\Desktop\jmeter\apache-jmeter-5.2\bin
+2019-12-06 13:47:53,185 INFO o.a.j.JMeter: IP: 10.0.75.1 Name: Msk2-Learning-08 FullName: Msk2-Learning-08
+2019-12-06 13:47:53,446 INFO o.a.j.g.a.LookAndFeelCommand: Installing Darcula LAF
+2019-12-06 13:47:53,467 INFO o.a.j.g.a.LookAndFeelCommand: Using look and feel: com.bulenkov.darcula.DarculaLaf [Darcula]
+2019-12-06 13:47:53,467 INFO o.a.j.JMeter: Setting LAF to: com.bulenkov.darcula.DarculaLaf
+2019-12-06 13:47:53,529 INFO o.a.j.JMeter: Loaded icon properties from org/apache/jmeter/images/icon.properties
+2019-12-06 13:47:54,233 WARN o.j.r.PluginManagerMenuCreator: Was unable to install pmgr cmdline tool
+java.nio.file.NoSuchFileException: C:\Users\student\Desktop\jmeter\bin\PluginsManagerCMD.bat
+	at sun.nio.fs.WindowsException.translateToIOException(Unknown Source) ~[?:1.8.0_231]
+	at sun.nio.fs.WindowsException.rethrowAsIOException(Unknown Source) ~[?:1.8.0_231]
+	at sun.nio.fs.WindowsException.rethrowAsIOException(Unknown Source) ~[?:1.8.0_231]
+	at sun.nio.fs.WindowsFileSystemProvider.newByteChannel(Unknown Source) ~[?:1.8.0_231]
+	at java.nio.file.spi.FileSystemProvider.newOutputStream(Unknown Source) ~[?:1.8.0_231]
+	at java.nio.file.Files.newOutputStream(Unknown Source) ~[?:1.8.0_231]
+	at java.nio.file.Files.copy(Unknown Source) ~[?:1.8.0_231]
+	at org.jmeterplugins.repository.PluginManagerCMDInstaller.writeOut(PluginManagerCMDInstaller.java:24) ~[jmeter-plugins-manager-1.3.jar:?]
+	at org.jmeterplugins.repository.PluginManagerCMDInstaller.main(PluginManagerCMDInstaller.java:12) ~[jmeter-plugins-manager-1.3.jar:?]
+	at org.jmeterplugins.repository.PluginManagerMenuCreator.getMenuItemsAtLocation(PluginManagerMenuCreator.java:16) [jmeter-plugins-manager-1.3.jar:?]
+	at org.apache.jmeter.gui.util.JMeterMenuBar.addPluginsMenuItems(JMeterMenuBar.java:558) [ApacheJMeter_core.jar:5.2]
+	at org.apache.jmeter.gui.util.JMeterMenuBar.makeOptionsMenu(JMeterMenuBar.java:325) [ApacheJMeter_core.jar:5.2]
+	at org.apache.jmeter.gui.util.JMeterMenuBar.createMenuBar(JMeterMenuBar.java:198) [ApacheJMeter_core.jar:5.2]
+	at org.apache.jmeter.gui.util.JMeterMenuBar.<init>(JMeterMenuBar.java:113) [ApacheJMeter_core.jar:5.2]
+	at org.apache.jmeter.gui.MainFrame.init(MainFrame.java:513) [ApacheJMeter_core.jar:5.2]
+	at org.apache.jmeter.gui.MainFrame.<init>(MainFrame.java:232) [ApacheJMeter_core.jar:5.2]
+	at org.apache.jmeter.JMeter.startGui(JMeter.java:398) [ApacheJMeter_core.jar:5.2]
+	at org.apache.jmeter.JMeter.start(JMeter.java:545) [ApacheJMeter_core.jar:5.2]
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.8.0_231]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(Unknown Source) ~[?:1.8.0_231]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[?:1.8.0_231]
+	at java.lang.reflect.Method.invoke(Unknown Source) ~[?:1.8.0_231]
+	at org.apache.jmeter.NewDriver.main(NewDriver.java:253) [ApacheJMeter.jar:5.2]
+2019-12-06 13:47:54,263 WARN o.j.r.PluginManager: Found JAR conflict: C:\Users\student\Desktop\jmeter\apache-jmeter-5.2\lib\ext\jmeter-plugins-manager-1.3.jar and C:\Users\student\Desktop\jmeter\apache-jmeter-5.2\lib\jmeter-plugins-manager-1.3.jar
+2019-12-06 13:47:54,520 INFO o.j.r.JARSourceHTTP: Requesting https://jmeter-plugins.org/repo/?installID=windows_10-6995c2828efe649593072d967876c3c5-gui
+2019-12-06 13:47:56,133 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/html is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2019-12-06 13:47:56,133 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xhtml+xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2019-12-06 13:47:56,133 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2019-12-06 13:47:56,133 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2019-12-06 13:47:56,133 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/vnd.wap.wml is org.apache.jmeter.protocol.http.parser.RegexpHTMLParser
+2019-12-06 13:47:56,133 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/css is org.apache.jmeter.protocol.http.parser.CssParser
+2019-12-06 13:47:56,522 INFO o.j.r.PluginManager: Plugins Status: [jpgc-graphs-additional=2.0, jpgc-casutg=2.9, jpgc-plugins-manager=1.3, jmeter-core=5.2, jmeter-ftp=5.2, jmeter-http=5.2, jmeter-jdbc=5.2, jmeter-jms=5.2, jmeter-junit=5.2, jmeter-java=5.2, jmeter-ldap=5.2, jmeter-mail=5.2, jmeter-mongodb=5.2, jmeter-native=5.2, jmeter-tcp=5.2, jmeter-components=5.2]
+2019-12-06 13:47:56,779 INFO o.a.j.e.KeyToolUtils: keytool found at 'keytool'
+2019-12-06 13:47:56,780 INFO o.a.j.p.h.p.ProxyControl: HTTP(S) Test Script Recorder SSL Proxy will use keys that support embedded 3rd party resources in file C:\Users\student\Desktop\jmeter\apache-jmeter-5.2\bin\proxyserver.jks
+2019-12-06 13:47:56,891 INFO o.a.j.s.FileServer: Default base='C:\Users\student\Desktop\jmeter\apache-jmeter-5.2\bin'
+2019-12-06 13:47:57,593 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2019-12-06 13:47:57,593 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to ISO-8859-1
+2019-12-06 13:47:57,593 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2019-12-06 13:47:57,593 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
