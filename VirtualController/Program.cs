@@ -9,7 +9,7 @@ namespace VirtualController
         {
             int VirtualController_Port = 8800;
             int VirtualRobots_Port = 8900;
-            int VirtualRobots_Count = 5;
+            int VirtualRobots_Count = 0;
 
 
             Console.WriteLine("Hello World!");

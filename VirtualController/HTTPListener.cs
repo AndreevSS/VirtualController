@@ -179,7 +179,7 @@ namespace VirtualController
                             case "/StartSession/": 
                                 if (!(VR.VS is null) && (VR.VS.status != "working"))
                                     {
-                                    SimpleResponse(context, "Session " + VR.VS.id + "started");
+                                    SimpleResponse(context, "Session " + VR.VS.id + " started");
                                     VR.VS.Start();                              
                                     }
                         
