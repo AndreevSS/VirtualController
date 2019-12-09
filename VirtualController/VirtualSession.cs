@@ -26,23 +26,16 @@ namespace VirtualController
         public void Start(ConcurrentQueue<string> VCQueue)
         {
             Random Random = new Random();
-
             double SleepTime = duration * 0.9 + duration * (Random.Next(100) * 0.002);
 
             this.status = "working";
             VCQueue.Enqueue("Session " + this.id + " is " + this.status + " for " + SleepTime);
-
-            // this.status = "working";
-            Thread sleep = new Thread(() => {
-                
+            Thread sleep = new Thread(() => {        
                 Thread.Sleep(Convert.ToInt32(SleepTime));
                 this.status = "finished";
                 VCQueue.Enqueue("Session " + this.id + " is " + this.status);
             });
             sleep.Start();
-       //     sleep.Join();
-
-            
         }
     }
 }

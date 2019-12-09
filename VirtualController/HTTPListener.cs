@@ -26,11 +26,9 @@ namespace VirtualController
             HttpListenerResponse response = context.Response;
 
             String ResponseString = "I'm response!\nAnswer is: " + Answer;
-
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(ResponseString);
             Stream output = response.OutputStream;
             output.Write(buffer, 0, buffer.Length);
-
             output.Close();
         }
 
@@ -47,7 +45,6 @@ namespace VirtualController
         public static String ToString(Stream stream)
         {
 
-     //       stream.Position = 0;
             StreamReader reader = new StreamReader(stream);
             string String = reader.ReadToEnd();
             return String;
@@ -71,22 +68,16 @@ namespace VirtualController
         }
 
         public static void CreateListener(int port, VirtualController VC)
-        {
+        { //Virtual Controller Listener
 
             if (!HttpListener.IsSupported)
             {
                 Console.WriteLine("Windows XP SP2 or Server 2003 is required to use the HttpListener class.");
                 return;
             }
-
-
             HttpListener listener = new HttpListener();
             listener.Prefixes.Add("http://localhost:" + port + "/");
             listener.Start();
-
-
-  
-            //      HttpListenerResponse response = context.Response;
             Console.WriteLine(port + ":(VC) Ожидание подключений...");
 
             while (true)
@@ -95,7 +86,6 @@ namespace VirtualController
                     HttpListenerContext context = listener.GetContext();
                     ConnectionInfo(context.Request);
                     HttpListenerRequest request = context.Request;
-
                     NameValueCollection BodyCol = new NameValueCollection();
                     BodyCol = KeysAndValuesFromBody(request.InputStream);
                
@@ -121,7 +111,7 @@ namespace VirtualController
                 }
             }
             public static void CreateListener(int port, VirtualRobot VR, ConcurrentQueue<string> VCQueue)
-        {
+        {  //Virtual Robot Listener
 
             if (!HttpListener.IsSupported)
             {

@@ -12,12 +12,8 @@ namespace VirtualController
             int VirtualRobots_Count = 25;
             int DBProcessors_Count = 5;
 
+            VirtualController VC = new VirtualController();   
 
-            Console.WriteLine("Hello World!");
-
-            VirtualController VC = new VirtualController();
-
-           
             VC.CreateController(VirtualController_Port, VirtualRobots_Port);
             VC.CreateDBProcessor(DBProcessors_Count);
             VC.CreateRobots(VirtualRobots_Count);

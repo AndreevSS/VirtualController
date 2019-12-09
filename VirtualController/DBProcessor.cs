@@ -12,7 +12,6 @@ namespace VirtualController
     {        
         public static void StartProcessor(ConcurrentQueue<string> VCQueue) 
     {
-          //  VCQueue.TryDequeue()
            while (true)
         {
             while (VCQueue.Count > 0)
@@ -23,7 +22,7 @@ namespace VirtualController
             }
             Thread.Sleep(50);
         }
-        Console.WriteLine("End");
+   //     Console.WriteLine("End");
     }
 
 

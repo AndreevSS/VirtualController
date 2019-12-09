@@ -21,13 +21,11 @@ namespace VirtualController
         public void CreateController(int port, int VRPorts)
         {
             
-
             this.VCport = port;
             this.VRPorts = VRPorts;
             
                 Thread th = new Thread(() => {
                     HTTPListener.CreateListener(VCport, this);
-                    //calling callback function
                 });
                 th.Name = "VirtualController_Thread";
                 th.Start();
@@ -40,14 +38,12 @@ namespace VirtualController
                for (int i = 0; i < VRCount; i++)
             {
                 int port = VRPortsCount + VRPorts;
-
                 VirtualRobot VR = new VirtualRobot(port, VRPortsCount, null);
 
                 VCQueue.Enqueue(Convert.ToString("Robot Created: " + (this.VRCount + i)));
 
                 Thread th = new Thread(() => {
                     HTTPListener.CreateListener(port, VR, VCQueue);
-                    //calling callback function
                 });
                 th.Name = "Robot_" + i;
                 th.Start();
@@ -66,7 +62,6 @@ namespace VirtualController
             {
                 Thread th = new Thread(() => {
                     DBProcessor.StartProcessor(VCQueue);
-                    //calling callback function
                 });
                 th.Name = "DBProcessor_" + (this.DBProcessorCount + i);
                 th.Start();
@@ -84,7 +79,6 @@ namespace VirtualController
             Console.WriteLine("Robot count = " + VRCount);
 
             return "Virtual Controller port = " + VCport + "\n1st Virtual Robot = " + VRPorts + "\nRobot count = " + VRCount + "";
-
         }
 
     }
