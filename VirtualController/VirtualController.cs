@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 
 namespace VirtualController
@@ -13,9 +15,13 @@ namespace VirtualController
         int VRCount;
         int VRPorts;
         int VRPortsCount = 0;
+        int DBProcessorCount = 0;
+        ConcurrentQueue<string> VCQueue = new ConcurrentQueue<string>();
 
         public void CreateController(int port, int VRPorts)
         {
+            
+
             this.VCport = port;
             this.VRPorts = VRPorts;
             
@@ -37,8 +43,10 @@ namespace VirtualController
 
                 VirtualRobot VR = new VirtualRobot(port, VRPortsCount, null);
 
+                VCQueue.Enqueue(Convert.ToString("Robot Created: " + (this.VRCount + i)));
+
                 Thread th = new Thread(() => {
-                    HTTPListener.CreateListener(port, VR);
+                    HTTPListener.CreateListener(port, VR, VCQueue);
                     //calling callback function
                 });
                 th.Name = "Robot_" + i;
@@ -48,11 +56,26 @@ namespace VirtualController
                 VRPortsCount++;
             }
 
-
-
-
             this.VRCount = this.VRCount  + VRCount;
         }
+
+        public void CreateDBProcessor(int DBProcessorCount)
+
+        {
+            for (int i = 0; i < DBProcessorCount; i++)
+            {
+                Thread th = new Thread(() => {
+                    DBProcessor.StartProcessor(VCQueue);
+                    //calling callback function
+                });
+                th.Name = "DBProcessor_" + (this.DBProcessorCount + i);
+                th.Start();
+                ThreadList.Add(th);
+            }
+
+            this.DBProcessorCount = this.DBProcessorCount + DBProcessorCount;
+        }
+
 
         public String GetValues()
         {

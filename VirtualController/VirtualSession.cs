@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Runtime;
+using System.Collections.Concurrent;
 
 namespace VirtualController
 {
@@ -22,19 +23,21 @@ namespace VirtualController
             this.status = status;
         }
 
-        public void Start()
+        public void Start(ConcurrentQueue<string> VCQueue)
         {
             Random Random = new Random();
 
-            double SleepTime = duration * 0.9 + duration * (Random.Next(1000) * 0.002 - 0.1 );
+            double SleepTime = duration * 0.9 + duration * (Random.Next(100) * 0.002);
 
+            this.status = "working";
+            VCQueue.Enqueue("Session " + this.id + " is " + this.status + " for " + SleepTime);
 
-
-           // this.status = "working";
+            // this.status = "working";
             Thread sleep = new Thread(() => {
-                this.status = "working";
-                Thread.Sleep(Convert.ToInt32(SleepTime * 10));
+                
+                Thread.Sleep(Convert.ToInt32(SleepTime));
                 this.status = "finished";
+                VCQueue.Enqueue("Session " + this.id + " is " + this.status);
             });
             sleep.Start();
        //     sleep.Join();

@@ -9,16 +9,18 @@ namespace VirtualController
         {
             int VirtualController_Port = 8800;
             int VirtualRobots_Port = 8900;
-            int VirtualRobots_Count = 0;
+            int VirtualRobots_Count = 25;
+            int DBProcessors_Count = 5;
 
 
             Console.WriteLine("Hello World!");
 
             VirtualController VC = new VirtualController();
 
+           
             VC.CreateController(VirtualController_Port, VirtualRobots_Port);
+            VC.CreateDBProcessor(DBProcessors_Count);
             VC.CreateRobots(VirtualRobots_Count);
-    //      VC.CreateRobots(20);
     //      VC.GetValues();
 
         }

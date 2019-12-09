@@ -4,6 +4,8 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Web;
+using System.Data.SqlClient;
+using System.Collections.Concurrent;
 
 namespace VirtualController
 {
@@ -21,7 +23,6 @@ namespace VirtualController
 
         static void SimpleResponse(HttpListenerContext context, String Answer)
         {
-            HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
 
             String ResponseString = "I'm response!\nAnswer is: " + Answer;
@@ -60,13 +61,13 @@ namespace VirtualController
         }
         public static void ConnectionInfo(HttpListenerRequest request)
         {
-            Console.WriteLine("URL: {0}", request.Url.OriginalString);
+          /*  Console.WriteLine("URL: {0}", request.Url.OriginalString);
             Console.WriteLine("Raw URL: {0}", request.RawUrl);
             Console.WriteLine("Path: {0}", Path(request.RawUrl));
             Console.WriteLine("method: {0}", request.HttpMethod);
             Console.WriteLine("{0} request was caught: {1}",
             request.HttpMethod, request.Url);
-            Console.WriteLine("Query: {0}", request.QueryString);
+            Console.WriteLine("Query: {0}", request.QueryString);*/
         }
 
         public static void CreateListener(int port, VirtualController VC)
@@ -119,7 +120,7 @@ namespace VirtualController
 
                 }
             }
-            public static void CreateListener(int port, VirtualRobot VR)
+            public static void CreateListener(int port, VirtualRobot VR, ConcurrentQueue<string> VCQueue)
         {
 
             if (!HttpListener.IsSupported)
@@ -151,18 +152,17 @@ namespace VirtualController
                         {
                             default: SimpleResponse(context, "Nothing is found!"); break;
                             case "/Token/":
-                                if (BodyCol.Get("token") != null)
+                                if (true)
                                 {
-                                   VR.token = BodyCol.Get("token");
-                                   SimpleResponse(context, "Token is added: " + BodyCol.Get("token"));
+                                   VR.token = Convert.ToString(new Random().Next());
+                                   SimpleResponse(context, "Token: " + VR.token);
                                 }
                                 else
                                 {
-                                   SimpleResponse(context, "Token is not added");
                                 };
                                 break;
                             case "/CreateSession/":
-                                if ( (VR.token == BodyCol.Get("token")) && (BodyCol.Get("time") != null) && (BodyCol.Get("duration") != null) ) 
+                                if ( /*(VR.token == BodyCol.Get("token")) && */(BodyCol.Get("time") != null) && (BodyCol.Get("duration") != null) ) 
                                 {
 
                                   int time = Convert.ToInt32(BodyCol.Get("time"));
@@ -170,6 +170,8 @@ namespace VirtualController
                                   VR.CreateSession(VR.id, time , duration, "created");
 
                                   SimpleResponse(context, "Session Created\n id = " + VR.VS.id + " time = " + VR.VS.time + " duration = " + VR.VS.duration);
+
+                                  VCQueue.Enqueue(Convert.ToString("Session Created: " + VR.id));
                                 }
                                 else
                                 {
@@ -180,7 +182,7 @@ namespace VirtualController
                                 if (!(VR.VS is null) && (VR.VS.status != "working"))
                                     {
                                     SimpleResponse(context, "Session " + VR.VS.id + " started");
-                                    VR.VS.Start();                              
+                                    VR.VS.Start(VCQueue);                              
                                     }
                         
                                 else
