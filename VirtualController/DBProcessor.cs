@@ -6,24 +6,24 @@ using System.Collections;
 
 using System.Threading;
 
-namespace VirtualController
+namespace ru.pflb.VirtualController
 {
     class DBProcessor
-    {        
-        public static void StartProcessor(ConcurrentQueue<string> VCQueue) 
     {
-           while (true)
+        public static void StartProcessor(ConcurrentQueue<string> VCQueue)
         {
-            while (VCQueue.Count > 0)
+            while (true)
             {
-                string Result = "";
-                if(VCQueue.TryDequeue(out Result))
-                Console.WriteLine("Thread " + Thread.CurrentThread.Name + " Dequeuing '{0}'", Result );
+                while (VCQueue.IsEmpty)
+                {
+                    string Result = "";
+                    if (VCQueue.TryDequeue(out Result))
+                        Console.WriteLine("Thread " + Thread.CurrentThread.Name + " Dequeuing '{0}'", Result);
+                }
+                Thread.Sleep(50);
             }
-            Thread.Sleep(50);
+            //     Console.WriteLine("End");
         }
-   //     Console.WriteLine("End");
-    }
 
 
     }

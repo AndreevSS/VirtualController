@@ -4,12 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 
-
-namespace VirtualController
+namespace ru.pflb.VirtualController
 {
     public class VirtualController
     {
-        ArrayList ThreadList = new ArrayList();
+        ArrayList ThreadListRobots = new ArrayList();
+        ArrayList ThreadListDBProcessors = new ArrayList();
+
 
         int VCport;
         int VRCount;
@@ -20,39 +21,40 @@ namespace VirtualController
 
         public void CreateController(int port, int VRPorts)
         {
-            
-            this.VCport = port;
+
+            VCport = port;
             this.VRPorts = VRPorts;
-            
-                Thread th = new Thread(() => {
-                    HTTPListener.CreateListener(VCport, this);
-                });
-                th.Name = "VirtualController_Thread";
-                th.Start();
-                ThreadList.Add(th);
+
+            Thread VCThread = new Thread(() =>
+            {
+                HTTPListener.CreateListener(VCport, this);
+            });
+            VCThread.Name = "VirtualController_Thread";
+            VCThread.Start();
         }
 
         public void CreateRobots(int VRCount)
 
         {
-               for (int i = 0; i < VRCount; i++)
+            for (int i = 0; i < VRCount; i++)
             {
                 int port = VRPortsCount + VRPorts;
                 VirtualRobot VR = new VirtualRobot(port, VRPortsCount, null);
 
                 VCQueue.Enqueue(Convert.ToString("Robot Created: " + (this.VRCount + i)));
 
-                Thread th = new Thread(() => {
+                Thread th = new Thread(() =>
+                {
                     HTTPListener.CreateListener(port, VR, VCQueue);
                 });
                 th.Name = "Robot_" + i;
                 th.Start();
-                ThreadList.Add(th);
+                ThreadListRobots.Add(th);
 
                 VRPortsCount++;
             }
 
-            this.VRCount = this.VRCount  + VRCount;
+            this.VRCount = this.VRCount + VRCount;
         }
 
         public void CreateDBProcessor(int DBProcessorCount)
@@ -60,19 +62,20 @@ namespace VirtualController
         {
             for (int i = 0; i < DBProcessorCount; i++)
             {
-                Thread th = new Thread(() => {
+                Thread th = new Thread(() =>
+                {
                     DBProcessor.StartProcessor(VCQueue);
                 });
                 th.Name = "DBProcessor_" + (this.DBProcessorCount + i);
                 th.Start();
-                ThreadList.Add(th);
+                ThreadListDBProcessors.Add(th);
             }
 
             this.DBProcessorCount = this.DBProcessorCount + DBProcessorCount;
         }
 
 
-        public String GetValues()
+        public string GetValues()
         {
             Console.WriteLine("Virtual Controller port = " + VCport);
             Console.WriteLine("1st Virtual Robot = " + VRPorts);

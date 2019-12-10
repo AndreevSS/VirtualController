@@ -9,3 +9,14 @@ C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualContro
 C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.AssemblyInfo.cs
 C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.dll
 C:\Users\student\Desktop\Новая папка (2)\Andreev123\http\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.pdb
+D:\GitProjects\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\VirtualController.exe
+D:\GitProjects\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\VirtualController.deps.json
+D:\GitProjects\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\VirtualController.runtimeconfig.json
+D:\GitProjects\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\VirtualController.runtimeconfig.dev.json
+D:\GitProjects\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\VirtualController.dll
+D:\GitProjects\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\VirtualController.pdb
+D:\GitProjects\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.csprojAssemblyReference.cache
+D:\GitProjects\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.AssemblyInfoInputs.cache
+D:\GitProjects\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.AssemblyInfo.cs
+D:\GitProjects\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.dll
+D:\GitProjects\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.pdb

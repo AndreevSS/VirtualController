@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace VirtualController
+namespace ru.pflb.VirtualController
 {
     class VirtualRobot
     {
@@ -17,7 +17,7 @@ namespace VirtualController
             this.token = token;
         }
 
-        public String GetValues()
+        public string GetValues()
         {
             Console.WriteLine("Robot ID = " + id);
             Console.WriteLine("port:  " + port);
@@ -28,7 +28,7 @@ namespace VirtualController
 
         public void CreateSession(int id, int time, int duration, string status)
         {
-            this.VS = new VirtualSession(id, time, duration, status);
+            VS = new VirtualSession(id, time, duration, status);
         }
     }
 }

@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualController", "VirtualController\VirtualController.csproj", "{B0F4D270-66E1-4916-9BC6-96627F17253E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HTTP_LISTENER", "..\HTTP_LISTENER\HTTP\HTTP_LISTENER\HTTP_LISTENER.csproj", "{17ED5AA8-2263-4258-8559-01A241A77963}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualController", "VirtualController\VirtualController.csproj", "{B0F4D270-66E1-4916-9BC6-96627F17253E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,6 @@ Global
 		{B0F4D270-66E1-4916-9BC6-96627F17253E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0F4D270-66E1-4916-9BC6-96627F17253E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0F4D270-66E1-4916-9BC6-96627F17253E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{17ED5AA8-2263-4258-8559-01A241A77963}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{17ED5AA8-2263-4258-8559-01A241A77963}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{17ED5AA8-2263-4258-8559-01A241A77963}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{17ED5AA8-2263-4258-8559-01A241A77963}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
