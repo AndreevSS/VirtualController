@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Runtime;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace ru.pflb.VirtualController
 {
@@ -12,7 +9,6 @@ namespace ru.pflb.VirtualController
         public int id;
         public int time;
         public int duration;
-
         public string status;
 
 
@@ -26,19 +22,31 @@ namespace ru.pflb.VirtualController
 
         public void Start(ConcurrentQueue<string> VCQueue)
         {
-            Random Random = new Random();
-            double SleepTime = duration * 0.9 + duration * (Random.NextDouble() * 0.2);
-
-            
-            status = "working";
-            VCQueue.Enqueue("Session " + id + " is " + status + " for " + SleepTime);
-            Thread sleep = new Thread(() =>
+            if (!(this is null) && this.status != "working")
             {
-                Thread.Sleep(Convert.ToInt32(SleepTime));
-                status = "finished";
-                VCQueue.Enqueue("Session " + id + " is " + status);
-            });
-            sleep.Start();
+                Random Random = new Random();
+                double SleepTime = duration * 0.9 + duration * (Random.NextDouble() * 0.2);
+
+                status = "working";
+                String RequestString = "update Sessions " +
+                                       "set status = '" + status + "' " +
+                                       "where id = " + id + ";";
+
+                VCQueue.Enqueue(RequestString);
+
+                Thread sleep = new Thread(() =>
+                {
+                    Thread.Sleep(Convert.ToInt32(SleepTime));
+                    status = "finished";
+
+                    String RequestString = "update Sessions " +
+                           "set status = '" + status + "' " +
+                           "where id = " + id + ";";
+
+                    VCQueue.Enqueue(RequestString);
+                });
+                sleep.Start();
+            }
         }
     }
 }

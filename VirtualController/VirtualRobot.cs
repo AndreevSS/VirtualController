@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Threading;
 
 namespace ru.pflb.VirtualController
 {
@@ -10,11 +11,20 @@ namespace ru.pflb.VirtualController
         public int id;
         public string token;
         public VirtualSession VS;
-        public VirtualRobot(int port, int id, string token)
+        public VirtualRobot(int port, int id, string token, ConcurrentQueue<string> VCQueue, ArrayList ThreadListRobots)
         {
             this.port = port;
             this.id = id;
             this.token = token;
+
+            Thread th = new Thread(() =>
+            {
+                HTTPListener HTTPListener = new HTTPListener();
+                HTTPListener.CreateListener(port, this, VCQueue);
+            });
+            th.Name = "Robot_" + id;
+            th.Start();
+            ThreadListRobots.Add(th);
         }
 
         public string GetValues()
@@ -28,7 +38,8 @@ namespace ru.pflb.VirtualController
 
         public void CreateSession(int id, int time, int duration, string status)
         {
-            VS = new VirtualSession(id, time, duration, status);
+            if ((time != null) && (duration != null))
+                VS = new VirtualSession(id, time, duration, status);
         }
     }
 }

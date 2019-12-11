@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\GitProjects\\VirtualController\\VirtualController\\VirtualController.csproj": {}
+    "F:\\GITPROJECTS\\VirtualController\\VirtualController\\VirtualController\\VirtualController.csproj": {}
   },
   "projects": {
-    "D:\\GitProjects\\VirtualController\\VirtualController\\VirtualController.csproj": {
+    "F:\\GITPROJECTS\\VirtualController\\VirtualController\\VirtualController\\VirtualController.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\GitProjects\\VirtualController\\VirtualController\\VirtualController.csproj",
+        "projectUniqueName": "F:\\GITPROJECTS\\VirtualController\\VirtualController\\VirtualController\\VirtualController.csproj",
         "projectName": "VirtualController",
-        "projectPath": "D:\\GitProjects\\VirtualController\\VirtualController\\VirtualController.csproj",
-        "packagesPath": "d:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "D:\\GitProjects\\VirtualController\\VirtualController\\obj\\",
+        "projectPath": "F:\\GITPROJECTS\\VirtualController\\VirtualController\\VirtualController\\VirtualController.csproj",
+        "packagesPath": "C:\\Users\\Kpoji4er\\.nuget\\packages\\",
+        "outputPath": "F:\\GITPROJECTS\\VirtualController\\VirtualController\\VirtualController\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "d:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Kpoji4er\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -37,6 +37,12 @@
       },
       "frameworks": {
         "netcoreapp3.0": {
+          "dependencies": {
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.8.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
