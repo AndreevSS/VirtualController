@@ -46,10 +46,10 @@ namespace ru.pflb.VirtualController
                         SqlCommand command = new SqlCommand(sql, this.connection);
                         SqlDataReader reader = command.ExecuteReader();
                         reader.Close();
-                    //    Thread.Sleep(20);
+                       Thread.Sleep(500);
                     }
                 }
-                Thread.Sleep(500);
+                //Thread.Sleep(500);
             }
             connection.Close();
         }

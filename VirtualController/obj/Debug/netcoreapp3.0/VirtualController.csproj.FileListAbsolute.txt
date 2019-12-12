@@ -50,3 +50,4 @@ F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\bin\Debug\n
 F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\ru.pflb.VirtualController.pdb
 F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\ru.pflb.VirtualController.dll
 F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\ru.pflb.VirtualController.pdb
+F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\ru.pflb.VirtualController.dll.config

@@ -27,7 +27,7 @@ namespace ru.pflb.VirtualController
             ThreadListRobots.Add(th);
         }
 
-        public string GetValues()
+        public string PrintValues()
         {
             Console.WriteLine("Robot ID = " + id);
             Console.WriteLine("port:  " + port);
@@ -38,7 +38,7 @@ namespace ru.pflb.VirtualController
 
         public void CreateSession(int id, int time, int duration, string status)
         {
-            if ((time != null) && (duration != null))
+            if ((time != 0) && (duration != 0))
                 VS = new VirtualSession(id, time, duration, status);
         }
     }

@@ -18,7 +18,7 @@ namespace ru.pflb.VirtualController
             BodyCol = HttpUtility.ParseQueryString(BodyString);
             return BodyCol;
         }
-        public static void SimpleResponse(HttpListenerContext context, string Answer)
+        public static void SimpleTextResponse(HttpListenerContext context, string Answer)
         {
             HttpListenerResponse response = context.Response;
 

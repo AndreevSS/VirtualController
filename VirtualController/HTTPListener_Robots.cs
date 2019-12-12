@@ -11,7 +11,6 @@ namespace ru.pflb.VirtualController
     class HTTPListener_Robots : HTTPListener
     {
         Random rnd = new Random();
-
         public void CreateListener(int port, VirtualRobot VR, ConcurrentQueue<string> VCQueue)
         {  //Virtual Robot Listener
 
@@ -38,7 +37,7 @@ namespace ru.pflb.VirtualController
 
                 switch (Path(context.Request.RawUrl))
                 {
-                    default: SimpleResponse(context, "Nothing is found!"); break;
+                    default: SimpleTextResponse(context, "Nothing is found!"); break;
                     case "/Token/":
                         CreateToken(VR, context);
                         break;
@@ -48,7 +47,7 @@ namespace ru.pflb.VirtualController
                     case "/StartSession/":
                         StartSession(VR, context, VCQueue);
                         break;
-                    case "/Values/": SimpleResponse(context, VR.GetValues()); break;
+                    case "/Values/": SimpleTextResponse(context, VR.PrintValues()); break;
                 }
                 Thread.Sleep(0);
             }
@@ -56,13 +55,13 @@ namespace ru.pflb.VirtualController
 
         void CreateToken(VirtualRobot VR, HttpListenerContext context)
         { VR.token = Convert.ToString(Guid.NewGuid());
-            SimpleResponse(context, "Token: " + VR.token);
+            SimpleTextResponse(context, "Token: " + VR.token);
         }
         void CreateSession(VirtualRobot VR, HttpListenerContext context, int time, int duration, ConcurrentQueue<string> VCQueue)
         {
             Thread.Sleep(rnd.Next(500));
             VR.CreateSession(VR.id, time, duration, "created");
-            SimpleResponse(context, "Session Created\n id = " + VR.VS.id +
+            SimpleTextResponse(context, "Session Created\n id = " + VR.VS.id +
                                     " time = " + VR.VS.time +
                                     " duration = " + VR.VS.duration);
             String RequestString = "insert into Sessions(Status, ID) " +
@@ -74,12 +73,12 @@ namespace ru.pflb.VirtualController
             if (!(VR.VS is null) && VR.VS.status != "working")
              {
              Thread.Sleep(rnd.Next(500));
-             SimpleResponse(context, "Session " + VR.VS.id + " started");
+             SimpleTextResponse(context, "Session " + VR.VS.id + " started");
              VR.VS.Start(VCQueue);
              }
             else
              {
-              SimpleResponse(context, "Session not started");
+              SimpleTextResponse(context, "Session not started");
              }
         }
 

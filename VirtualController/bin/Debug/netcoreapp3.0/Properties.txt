@@ -1,0 +1,10 @@
+VirtualController_Port = 8800
+VirtualRobots_Port = 8900
+VirtualRobots_Count = 5
+DBProcessors_Count = 5
+VirtualRobots_FirstPort = 8900
+VirtualRobots_LastPort = 9000
+DataSource = "DESKTOP-4BU392E"
+UserID = "TestLogin"
+Password = "pwd"
+InitialCatalog = "MyDB"

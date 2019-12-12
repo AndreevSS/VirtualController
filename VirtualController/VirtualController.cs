@@ -77,7 +77,7 @@ namespace ru.pflb.VirtualController
         }
 
 
-        public string GetValues()
+        public string PrintValues()
         {
             Console.WriteLine("Virtual Controller port = " + VCport);
             Console.WriteLine("1st Virtual Robot = " + VRPorts);

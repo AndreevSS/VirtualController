@@ -34,12 +34,12 @@ namespace ru.pflb.VirtualController
 
                 switch (Path(context.Request.RawUrl))
                 {
-                    default: SimpleResponse(context, "I'm Virtual Controller"); break;
+                    default: SimpleTextResponse(context, "I'm Virtual Controller"); break;
                     case "/CreateRobots/":
                         VC.CreateRobots(Convert.ToInt32(BodyCol.Get("count")));
-                        SimpleResponse(context, "CreatingRobots " + BodyCol.Get("count"));
+                        SimpleTextResponse(context, "CreatingRobots " + BodyCol.Get("count"));
                         break;
-                    case "/Values/": SimpleResponse(context, VC.GetValues()); break;
+                    case "/Values/": SimpleTextResponse(context, VC.PrintValues()); break;
                 }
                 Thread.Sleep(0);
             }
