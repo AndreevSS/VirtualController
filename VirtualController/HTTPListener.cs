@@ -10,8 +10,6 @@ namespace ru.pflb.VirtualController
 {
     class HTTPListener
     {
-        Random rnd = new Random();
-
         public static NameValueCollection KeysAndValuesFromBody(Stream stream)
         {
 
@@ -20,8 +18,7 @@ namespace ru.pflb.VirtualController
             BodyCol = HttpUtility.ParseQueryString(BodyString);
             return BodyCol;
         }
-
-        static void SimpleResponse(HttpListenerContext context, string Answer)
+        public static void SimpleResponse(HttpListenerContext context, string Answer)
         {
             HttpListenerResponse response = context.Response;
 
@@ -66,112 +63,6 @@ namespace ru.pflb.VirtualController
               request.HttpMethod, request.Url);
               Console.WriteLine("Query: {0}", request.QueryString);
         }
-
-        public static void CreateListener(int port, VirtualController VC)
-        { //Virtual Controller Listener
-
-            if (!HttpListener.IsSupported)
-            {
-                Console.WriteLine("Windows XP SP2 or Server 2003 is required to use the HttpListener class.");
-                return;
-            }
-            HttpListener listener = new HttpListener();
-            listener.Prefixes.Add("http://localhost:" + port + "/");
-            listener.Start();
-            Console.WriteLine(port + ":(VC) Ожидание подключений...");
-
-            while (true)
-            {
-                // метод GetContext блокирует текущий поток, ожидая получение запроса 
-                HttpListenerContext context = listener.GetContext();
-            //    ConnectionInfo(context.Request);
-                HttpListenerRequest request = context.Request;
-                NameValueCollection BodyCol = new NameValueCollection();
-                BodyCol = KeysAndValuesFromBody(request.InputStream);
-
-                switch (Path(context.Request.RawUrl))
-                {
-                    default: SimpleResponse(context, "I'm Virtual Controller"); break;
-                    case "/CreateRobots/":
-                        VC.CreateRobots(Convert.ToInt32(BodyCol.Get("count")));
-                        SimpleResponse(context, "CreatingRobots");
-                        break;
-                    case "/Values/": SimpleResponse(context, VC.GetValues()); break;
-                }
-                Thread.Sleep(0);
-            }
-        }
-
-        public void CreateListener(int port, VirtualRobot VR, ConcurrentQueue<string> VCQueue)
-        {  //Virtual Robot Listener
-
-            if (!HttpListener.IsSupported)
-            {
-                Console.WriteLine("Windows XP SP2 or Server 2003 is required to use the HttpListener class.");
-                return;
-            }
-
-            HttpListener listener = new HttpListener();
-            listener.Prefixes.Add("http://localhost:" + port + "/");
-            listener.Start();
-            Console.WriteLine(port + ":(VR) Ожидание подключений...");
-
-            while (true)
-            {
-                // метод GetContext блокирует текущий поток, ожидая получение запроса 
-                HttpListenerContext context = listener.GetContext();
-                //ConnectionInfo(context.Request);
-                HttpListenerRequest request = context.Request;
-
-                NameValueCollection BodyCol = new NameValueCollection();
-                BodyCol = KeysAndValuesFromBody(request.InputStream);
-
-                switch (Path(context.Request.RawUrl))
-                {
-                    default: SimpleResponse(context, "Nothing is found!"); break;
-                    case "/Token/":
-                        VR.token = Convert.ToString(Guid.NewGuid());
-                        SimpleResponse(context, "Token: " + VR.token);
-                        break;
-                    case "/CreateSession/":
-                        //     if ( /*(VR.token == BodyCol.Get("token")) && */BodyCol.Get("time") != null && BodyCol.Get("duration") != null)
-                        //      {                            
-                        Thread.Sleep(rnd.Next(500));
-                        int time = Convert.ToInt32(BodyCol.Get("time"));
-                        int duration = Convert.ToInt32(BodyCol.Get("duration"));
-                        VR.CreateSession(VR.id, time, duration, "created");
-                        SimpleResponse(context, "Session Created\n id = " + VR.VS.id + " time = " + VR.VS.time + " duration = " + VR.VS.duration);
-                        String RequestString = "insert into Sessions(Status, ID) " +
-                                               "values('" + VR.VS.status + "' , " + VR.VS.id + ");";
-                        VCQueue.Enqueue(RequestString);
-                        //       }
-                        //         else
-                        //     {
-                        //           SimpleResponse(context, "Wrong Request");
-                        //   };
-                        break;
-                    case "/StartSession/":
-                        if (!(VR.VS is null) && VR.VS.status != "working")
-                        {
-                            Thread.Sleep(rnd.Next(500));
-                            SimpleResponse(context, "Session " + VR.VS.id + " started");
-                            VR.VS.Start(VCQueue);
-                        }
-
-                        else
-                        {
-                            SimpleResponse(context, "Session not started");
-                        }
-
-                        break;
-                    case "/Values/": SimpleResponse(context, VR.GetValues()); break;
-                }
-
-                Thread.Sleep(0);
-
-            }
-        }
-
-
+               
     }
 }

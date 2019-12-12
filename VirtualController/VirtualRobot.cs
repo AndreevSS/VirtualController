@@ -19,7 +19,7 @@ namespace ru.pflb.VirtualController
 
             Thread th = new Thread(() =>
             {
-                HTTPListener HTTPListener = new HTTPListener();
+                HTTPListener_Robots HTTPListener = new HTTPListener_Robots();
                 HTTPListener.CreateListener(port, this, VCQueue);
             });
             th.Name = "Robot_" + id;

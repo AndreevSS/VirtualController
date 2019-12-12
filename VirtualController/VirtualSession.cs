@@ -22,7 +22,7 @@ namespace ru.pflb.VirtualController
 
         public void Start(ConcurrentQueue<string> VCQueue)
         {
-            if (!(this is null) && this.status != "working")
+            if (!(this is null) || this.status != "working")
             {
                 Random Random = new Random();
                 double SleepTime = duration * 0.9 + duration * (Random.NextDouble() * 0.2);

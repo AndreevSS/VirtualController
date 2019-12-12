@@ -31,7 +31,7 @@ namespace ru.pflb.VirtualController
 
             Thread VCThread = new Thread(() =>
             {
-                HTTPListener HTTPListener = new HTTPListener();
+                HTTPListener_VirtualController HTTPListener = new HTTPListener_VirtualController();
                 HTTPListener.CreateListener(VCport, this);
             });
             VCThread.Name = "VirtualController_Thread";
