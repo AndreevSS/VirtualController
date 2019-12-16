@@ -6,13 +6,13 @@ namespace ru.pflb.VirtualController
 {
     class VirtualSession
     {
-        public int id;
+        public string id;
         public int time;
         public int duration;
         public string status;
 
 
-        public VirtualSession(int id, int time, int duration, string status)
+        public VirtualSession(string id, int time, int duration, string status)
         {
             this.id = id;
             this.time = time;
@@ -27,21 +27,21 @@ namespace ru.pflb.VirtualController
                 Random Random = new Random();
                 double SleepTime = duration * 0.9 + duration * (Random.NextDouble() * 0.2);
 
-                status = "working";
-                String RequestString = "update Sessions " +
-                                       "set status = '" + status + "' " +
-                                       "where id = " + id + ";";
+                status = "1 (Running)";
+                String RequestString = "update BPASession " +
+                                       "set statusid = '" + status + "' " +
+                                       "where sessionid = '" + id + "';";
 
                 VCQueue.Enqueue(RequestString);
 
                 Thread sleep = new Thread(() =>
                 {
                     Thread.Sleep(Convert.ToInt32(SleepTime));
-                    status = "finished";
+                    status = "2";
 
-                    String RequestString = "update Sessions " +
-                           "set status = '" + status + "' " +
-                           "where id = " + id + ";";
+                    String RequestString = "update BPASession " +
+                                           "set statusid = '" + status + "' " +
+                                           "where sessionid = '" + id + "';";
 
                     VCQueue.Enqueue(RequestString);
                 });

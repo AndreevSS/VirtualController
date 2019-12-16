@@ -11,15 +11,17 @@ namespace ru.pflb.VirtualController
         public int id;
         public string token;
         public VirtualSession VS;
-        public VirtualRobot(int port, int id, string token, ConcurrentQueue<string> VCQueue, ArrayList ThreadListRobots)
+        public HTTPListener_Robots HTTPListener;
+        public VirtualRobot(int port, int id, ConcurrentQueue<string> VCQueue, ArrayList ThreadListRobots)
         {
             this.port = port;
             this.id = id;
-            this.token = token;
+            this.token = null;
 
             Thread th = new Thread(() =>
             {
                 HTTPListener_Robots HTTPListener = new HTTPListener_Robots();
+                this.HTTPListener = HTTPListener;
                 HTTPListener.CreateListener(port, this, VCQueue);
             });
             th.Name = "Robot_" + id;
@@ -36,7 +38,7 @@ namespace ru.pflb.VirtualController
             return "Robot ID = " + id + "\nport: " + port + "\ntoken = " + token + "";
         }
 
-        public void CreateSession(int id, int time, int duration, string status)
+        public void CreateSession(string id, int time, int duration, string status)
         {
             if ((time != 0) && (duration != 0))
                 VS = new VirtualSession(id, time, duration, status);

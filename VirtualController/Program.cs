@@ -31,7 +31,7 @@ namespace ru.pflb.VirtualController
             String DataSource;
             String UserID;
             String Password;
-            String InitialCatalog ;
+            String InitialCatalog;
 
 
             Properties.TryGetValue("VirtualController_Port", out string Result);

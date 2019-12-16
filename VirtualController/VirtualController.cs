@@ -47,7 +47,7 @@ namespace ru.pflb.VirtualController
                 {
                     int port = (int)RobotPorts[0];
                     RobotPorts.Remove(port);
-                    VirtualRobot VR = new VirtualRobot(port, Robots.Count, null, VCQueue, ThreadListRobots);
+                    VirtualRobot VR = new VirtualRobot(port, port /*Robots.Count*/, VCQueue, ThreadListRobots);
                     Robots.Add(VR);
                  //   VRPortsCount++;
                 }
