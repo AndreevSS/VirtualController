@@ -22,28 +22,19 @@ namespace ru.pflb.VirtualController
 
         public void Start(ConcurrentQueue<string> VCQueue)
         {
-            if (!(this is null) || this.status != "working")
+            if (!(this is null) || this.status != "1 (Pending")
             {
                 Random Random = new Random();
                 double SleepTime = duration * 0.9 + duration * (Random.NextDouble() * 0.2);
 
                 status = "1 (Running)";
-                String RequestString = "update BPASession " +
-                                       "set statusid = '" + status + "' " +
-                                       "where sessionid = '" + id + "';";
-
-                VCQueue.Enqueue(RequestString);
+                VCQueue.Enqueue(DBQueries.UpdateSession(id, status));
 
                 Thread sleep = new Thread(() =>
                 {
                     Thread.Sleep(Convert.ToInt32(SleepTime));
                     status = "2";
-
-                    String RequestString = "update BPASession " +
-                                           "set statusid = '" + status + "' " +
-                                           "where sessionid = '" + id + "';";
-
-                    VCQueue.Enqueue(RequestString);
+                    VCQueue.Enqueue(DBQueries.UpdateSession(id, status));
                 });
                 sleep.Start();
             }

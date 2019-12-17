@@ -34,81 +34,39 @@ namespace ru.pflb.VirtualController
                 HttpListenerContext context = listener.GetContext();
                 //ConnectionInfo(context.Request);
                 HttpListenerRequest request = context.Request;
-
                 NameValueCollection BodyCol = new NameValueCollection();
                 BodyCol = KeysAndValuesFromBody(request.InputStream);
                 GroupCollection pathGroup = Regex.Match(context.Request.RawUrl, "(.+?)(%20.*)").Groups;
+                GroupCollection groups;
 
-                string[] arr = new string[2];
-
-                //              pathGroup.CopyTo(arr, 0);
-
-                //       String RegexCommand = Regex.Match(context.Request.RawUrl, "(.+?)(%20.*)").Groups[1].ToString();
-                //        String RegexString = Regex.Match(context.Request.RawUrl, "(.+?)(%20.*)").Groups[2].ToString();
-
-
-
-
-
-                string password;
-                //bool isPathFound = false;
-
-                /*               if (Regex.IsMatch(RegexCommand, "getauthtoken"))
-                               {
-
-                                   GroupCollection groups = Regex.Match(RegexString, "%20(.*?)%20(.*?)%20(.*)").Groups;
-                                   processid = groups[1].ToString();
-                                   userid = groups[2].ToString();
-                                   password = groups[3].ToString();
-
-                              //     isPathFound = true;
-                                   CreateToken(VR, context, userid);
-                               };
-
-                               if (Regex.IsMatch(RegexCommand, "getauthtoken"))
-                               {
-
-                                   GroupCollection groups = Regex.Match(RegexString, "%20(.*?)%20(.*?)%20(.*)").Groups;
-                                   processid = groups[1].ToString();
-                                   userid = groups[2].ToString();
-                                   password = groups[3].ToString();
-
-                                //   isPathFound = true;
-                                   CreateToken(VR, context, userid);
-                               };
-                               */
                 switch (pathGroup[1].Value)
                 {
                     default: SimpleTextResponse(context, "400"); break;
                     case "/getauthtoken":
                         //CreateToken(VR, context);
-                        GroupCollection groups = Regex.Match(pathGroup[2].Value, "%20(.*?)%20(.*?)%20(.*)").Groups;
+                        groups = Regex.Match(pathGroup[2].Value, "%20(.*?)%20(.*?)%20(.*)").Groups;
                         processid = groups[1].Value;
                         userid = groups[2].Value;
-                        password = groups[3].Value;
+                        //password = groups[3].Value;
                         CreateToken(VR, context, userid, VCQueue);
                         break;
                     case "/user":
 
                         if (Regex.IsMatch(pathGroup[2].Value, "createas"))
-                            {
-                            //pathGroup[2]
-                            GroupCollection groups2 = Regex.Match(pathGroup[2].Value, "%20(.*?)&password%20(.*?)&busy&createas%20(.*)%20(.*)").Groups;
+                        {
+                            
+                            groups = Regex.Match(pathGroup[2].Value, "%20(.*?)&password%20(.*?)&busy&createas%20(.*)%20(.*)").Groups;
 
                             CreateSession(VR, context, Convert.ToInt32(BodyCol.Get("time")), Convert.ToInt32(BodyCol.Get("duration")), VCQueue, userid);
                         }
 
                         if (Regex.IsMatch(pathGroup[2].Value, "startas"))
                         {
-                            //pathGroup[2]
-                            GroupCollection groups3 = Regex.Match(pathGroup[2].Value, "%20(.*?)&password%20(.*?)&busy&startas%20(.*)%20(.*)").Groups;
+                           
+                            groups = Regex.Match(pathGroup[2].Value, "%20(.*?)&password%20(.*?)&busy&startas%20(.*)%20(.*)").Groups;
                             StartSession(VR, context, VCQueue);
                         }
-
                         break;
-      //              case "/StartSession/":
-                        
-        //                break;
                     case "/Values/": SimpleTextResponse(context, VR.PrintValues()); break;
                 }
                 Thread.Sleep(0);
@@ -129,30 +87,16 @@ namespace ru.pflb.VirtualController
                 Result = Result + letters[RND];
             }
 
-            VR.token = Result;
-
-            String RequestString = "insert into BPAInternalAuth(UserID, Token, Expiry, Roles, LoggedInMode, isWebService)" +
-                       "values('" + userid + "', '" + VR.token + "', CURRENT_TIMESTAMP, 10, 2, 0); ";
-
-
-            VCQueue.Enqueue(RequestString);
-
+            VR.token = Result;          
+            VCQueue.Enqueue(DBQueries.CreateToken(userid, VR.token));
             SimpleTextResponse(context, UserID + "" + VR.token);
         }
         void CreateSession(VirtualRobot VR, HttpListenerContext context, int time, int duration, ConcurrentQueue<string> VCQueue, string userid)
         {
-
             String sessionid = Guid.NewGuid().ToString();
-
             Thread.Sleep(rnd.Next(500));
-            VR.CreateSession(sessionid, time, duration, "0 (Pending)");
-
-            String RequestString = "insert into BPASession(sessionid, startdatetime, processid, starteruserid," +
-                                   "runningresourceid, starterresourceid, statusid, starttimeoffsetzone)" +
-                                   "values('" + sessionid + "', CURRENT_TIMESTAMP, '" + processid + "','" + userid + "','"
-                                   + VR.id + "','" + VR.id + "','" + VR.VS.status + "', '10800' )";
-
-            VCQueue.Enqueue(RequestString);
+            VR.CreateSession(sessionid, time, duration, "0 (Pending)");           
+            VCQueue.Enqueue(DBQueries.CreateSession(sessionid,processid,userid, VR.id));
 
             SimpleTextResponse(context,
                                     "USER SET\r\n" +

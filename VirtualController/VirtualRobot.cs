@@ -8,11 +8,11 @@ namespace ru.pflb.VirtualController
     class VirtualRobot
     {
         int port;
-        public int id;
+        public string id;
         public string token;
         public VirtualSession VS;
         public HTTPListener_Robots HTTPListener;
-        public VirtualRobot(int port, int id, ConcurrentQueue<string> VCQueue, ArrayList ThreadListRobots)
+        public VirtualRobot(int port, string id, ConcurrentQueue<string> VCQueue, ArrayList ThreadListRobots)
         {
             this.port = port;
             this.id = id;
