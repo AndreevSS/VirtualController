@@ -11,10 +11,13 @@ namespace ru.pflb.VirtualController
 {
     class HTTPListener_Robots : HTTPListener
     {
+
+
+        public HttpListener listener = new HttpListener();
         Random rnd = new Random();
         string userid = "";
         string processid = "";
-        public void CreateListener(int port, VirtualRobot VR, ConcurrentQueue<string> VCQueue)
+        public void CreateListener(int port, VirtualRobot VR, ConcurrentQueue<string> VCQueue, bool isStopped)
         {  //Virtual Robot Listener
 
             if (!HttpListener.IsSupported)
@@ -23,13 +26,16 @@ namespace ru.pflb.VirtualController
                 return;
             }
 
-            HttpListener listener = new HttpListener();
+            
+            
             listener.Prefixes.Add("http://localhost:" + port + "/");
             listener.Start();
             Console.WriteLine(port + ":(VR) Ожидание подключений...");
 
-            while (true)
+
+            while (!VR.isStopped)
             {
+
                 // метод GetContext блокирует текущий поток, ожидая получение запроса 
                 HttpListenerContext context = listener.GetContext();
                 //ConnectionInfo(context.Request);
@@ -69,7 +75,7 @@ namespace ru.pflb.VirtualController
                         break;
                     case "/Values/": SimpleTextResponse(context, VR.PrintValues()); break;
                 }
-                Thread.Sleep(0);
+                Thread.Sleep(0);     
             }
         }
 

@@ -39,6 +39,10 @@ namespace ru.pflb.VirtualController
                         VC.CreateRobots(Convert.ToInt32(BodyCol.Get("count")));
                         SimpleTextResponse(context, "CreatingRobots " + BodyCol.Get("count"));
                         break;
+                    case "/StopRobots/":
+                        VC.StopRobots(Convert.ToInt32(BodyCol.Get("count")));
+                        SimpleTextResponse(context, "CreatingRobots " + BodyCol.Get("count"));
+                        break;
                     case "/Values/": SimpleTextResponse(context, VC.PrintValues()); break;
                 }
                 Thread.Sleep(0);

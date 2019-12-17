@@ -58,6 +58,30 @@ namespace ru.pflb.VirtualController
             this.VRCount = this.VRCount + VRCount;
         }
 
+        public void StopRobots(int VRCount)
+
+        {
+            for (int i = 0; i < VRCount; i++)
+            {
+                if (Robots.Count > 0 )
+                {
+                    VirtualRobot VR = (VirtualRobot) Robots[Robots.Count - 1];
+
+                    Console.WriteLine("Robot " + VR.port + " stopped");
+                    VR.isStopped = true;                    
+                    Robots.Remove(VR);
+                    RobotPorts.Add(VR.port);
+                    RobotPorts.Sort();
+                    VR.HTTPListener.listener.Abort();
+
+                }
+                else
+                    Console.WriteLine("No Robots left");
+            }
+
+            this.VRCount = this.VRCount - VRCount;
+        }
+
         public void CreateDBProcessor(int DBProcessorCount, string DataSource, string UserID, string Password, string InitialCatalog)
 
         {

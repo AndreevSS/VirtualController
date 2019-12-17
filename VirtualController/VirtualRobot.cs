@@ -7,7 +7,9 @@ namespace ru.pflb.VirtualController
 {
     class VirtualRobot
     {
-        int port;
+        public Thread thread;
+        public bool isStopped = false;
+        public int port;
         public string id;
         public string token;
         public VirtualSession VS;
@@ -22,9 +24,10 @@ namespace ru.pflb.VirtualController
             {
                 HTTPListener_Robots HTTPListener = new HTTPListener_Robots();
                 this.HTTPListener = HTTPListener;
-                HTTPListener.CreateListener(port, this, VCQueue);
+                HTTPListener.CreateListener(port, this, VCQueue, isStopped);
             });
             th.Name = "Robot_" + id;
+            this.thread = th;
             th.Start();
             ThreadListRobots.Add(th);
         }
