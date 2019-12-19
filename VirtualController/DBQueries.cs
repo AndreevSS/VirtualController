@@ -4,8 +4,19 @@ using System.Text;
 
 namespace ru.pflb.VirtualController
 {
+
     static class DBQueries
     {
+        public static string Status(int status_id)
+        {
+            switch (status_id)
+            {
+                case 0: return "0 (Pending)";
+                case 1: return "1 (Running)";
+                case 2: return "2 (Finished)";
+                default: return "(not found)";
+            }         
+         }
 
         public static string CreateToken(string userid, string VR_token)
         {
@@ -18,19 +29,18 @@ namespace ru.pflb.VirtualController
         public static string CreateSession(string sessionid, string processid, string userid, string VR_id)
         {
 
-            String status = "(Pending)";
             String RequestString = "insert into BPASession(sessionid, startdatetime, processid, starteruserid," +
                                    "runningresourceid, starterresourceid, statusid, starttimeoffsetzone)" +
                                    "values('" + sessionid + "', CURRENT_TIMESTAMP, '" + processid + "','" + userid + "','"
-                                   + VR_id + "','" + VR_id + "','" + status + "', '10800' )";
+                                   + VR_id + "','" + VR_id + "','" + Status(0) + "', '10800' )";
             return RequestString;
         }
 
-        public static string UpdateSession(string sessionid, string status)
+        public static string UpdateSession(string sessionid, int statusid)
         {
-                        String RequestString = "update BPASession " +
-                           "set statusid = '" + status + "' " +
-                           "where sessionid = '" + sessionid + "';";
+            String RequestString = "update BPASession " +
+               "set statusid = '" + Status(statusid) + "' " +
+               "where sessionid = '" + sessionid + "';";
 
 
             return RequestString;

@@ -1,0 +1,3 @@
+F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\obj\Debug\netcoreapp1.0\VirtualController.csprojAssemblyReference.cache
+F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\obj\Debug\netcoreapp1.0\VirtualController.AssemblyInfoInputs.cache
+F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\obj\Debug\netcoreapp1.0\VirtualController.AssemblyInfo.cs

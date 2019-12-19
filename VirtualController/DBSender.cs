@@ -26,7 +26,7 @@ namespace ru.pflb.VirtualController
             {
                 Console.WriteLine(e.ToString());
             }
-            Thread.Sleep(0);
+            Thread.Sleep(50);
         }
         public void StartSender(ConcurrentQueue<string> VCQueue)
         {
@@ -39,17 +39,22 @@ namespace ru.pflb.VirtualController
                 {
                     if (VCQueue.TryDequeue(out string Result))
                     {
-                        Console.WriteLine(DateTime.Now + ": Thread " + Thread.CurrentThread.Name + " Dequeuing '{0}'", Result);
+                        Console.WriteLine(DateTime.Now + ": VCQueue.count=" + VCQueue.Count + " Thread " + Thread.CurrentThread.Name + " Dequeuing '{0}'", Result);
                         StringBuilder sb = new StringBuilder();
                         sb.Append(Result);
                         String sql = sb.ToString();
                         SqlCommand command = new SqlCommand(sql, this.connection);
                         SqlDataReader reader = command.ExecuteReader();
                         reader.Close();
-                       Thread.Sleep(500);
+                       
                     }
+
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
+
                 }
-                //Thread.Sleep(500);
+                Thread.Sleep(50);
             }
             connection.Close();
         }
