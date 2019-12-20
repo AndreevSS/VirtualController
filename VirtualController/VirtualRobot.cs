@@ -96,7 +96,7 @@ namespace ru.pflb.VirtualController
 
                 }
                 ConnectionHandler.SimpleTextResponse(context, responseText);
-                Thread.Sleep(50);
+                Thread.Sleep(10);
             }
         }
 

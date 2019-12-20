@@ -62,19 +62,23 @@ namespace ru.pflb.VirtualController
         }
         public void CreateRobots(int VRCount)
         {
+            string[] prefixesToAdd = new string[VRCount];
+
             for (int i = 0; i < VRCount; i++)
             {
                 if (RobotPorts.Count > 0)
                 {
                     int port = (int)RobotPorts[0];
                     RobotPorts.Remove(port);
-                    VirtualRobot VR = new VirtualRobot(port, Convert.ToString(port), VCQueue, server);                    
-                    server.Start(new string[] { "http://*:" + port + "/" });
+                    VirtualRobot VR = new VirtualRobot(port, Convert.ToString(port), VCQueue, server);
+                    prefixesToAdd[i] = "http://*:" + VR.port + "/";
                     Robots.Add(VR);
                 }
                 else
                     Console.WriteLine("RobotPorts Array is Empty");
             }
+
+            server.Start(new string[] { "prefixesToAdd" });
             this.VRCount = this.VRCount + VRCount;
         }
         public void StopRobots(int VRCount)
