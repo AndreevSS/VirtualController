@@ -1,9 +1,11 @@
+#VC DATA
 VirtualController_Port=8800
-VirtualRobots_Port = 9900
-VirtualRobots_Count = 5
-DBProcessors_Count = 5
+VirtualRobots_Count = 0
+DBProcessors_Count = 0
 VirtualRobots_FirstPort = 8900
 VirtualRobots_LastPort = 9000
+
+#DB DATA
 DataSource = "DESKTOP-4BU392E"
 UserID = "TestLogin"
 Password = "pwd"

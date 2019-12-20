@@ -22,9 +22,7 @@ namespace ru.pflb.VirtualController
 
 
             int VirtualController_Port = 0;
-            int VirtualRobots_Port = 0;
-
-            int VirtualRobots_Count = 0;
+            
             int DBProcessors_Count = 0;
             int VirtualRobots_FirstPort = 0;
             int VirtualRobots_LastPort = 0;
@@ -37,12 +35,6 @@ namespace ru.pflb.VirtualController
 
             Properties.TryGetValue("VirtualController_Port", out string Result);
             VirtualController_Port = Convert.ToInt32(Result);
-
-            Properties.TryGetValue("VirtualRobots_Port ", out Result);
-            VirtualRobots_Port = Convert.ToInt32(Result);
-
-            Properties.TryGetValue("VirtualRobots_Count", out Result);
-            VirtualRobots_Count = Convert.ToInt32(Result);
 
             Properties.TryGetValue("DBProcessors_Count", out Result);
             DBProcessors_Count = Convert.ToInt32(Result);
@@ -69,8 +61,8 @@ namespace ru.pflb.VirtualController
         
             
 
-            VirtualController VC = new VirtualController(VirtualController_Port, VirtualRobots_Port, RobotPorts);            
- //           VC.CreateDBProcessor(DBProcessors_Count, DataSource, UserID, Password, InitialCatalog);
+            VirtualController VC = new VirtualController(VirtualController_Port, RobotPorts);            
+            VC.CreateDBSender(DBProcessors_Count, DataSource, UserID, Password, InitialCatalog);
    
         }
 

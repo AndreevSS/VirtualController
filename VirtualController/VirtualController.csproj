@@ -8,7 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="HTTPListener_Robot.cs" />
+    <Compile Remove="HTTPListener_VirtualController.cs" />
     <Compile Remove="Properties.cs" />
+    <Compile Remove="VirtualRobotThread.cs" />
   </ItemGroup>
 
   <ItemGroup>

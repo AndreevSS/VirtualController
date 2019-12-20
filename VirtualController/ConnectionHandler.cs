@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CSharpTest.Net.Http;
+using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Specialized;
 using System.IO;
@@ -8,14 +10,8 @@ using System.Web;
 
 namespace ru.pflb.VirtualController
 {
-    class ConnectionHandler
+    public static class ConnectionHandler
     {
-        public HttpListener listener;
-       public ConnectionHandler()
-        {
-            this.listener = new HttpListener();
-        }
-        
         public static NameValueCollection KeysAndValuesFromBody(Stream stream)
         {
 

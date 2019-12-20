@@ -1,8 +1,0 @@
-﻿BPAInternalAuth
-UserID Token Expiry Roles LoggedInMode Processid isWebService
-guid guid			10		2				null		0
-
-bpasession
-sessionid sessionnumber startdatetime enddatetime processid	 startedresourced starteruseid runningresourseid statusid starttimeoffsetzone
-							
-BPAResource

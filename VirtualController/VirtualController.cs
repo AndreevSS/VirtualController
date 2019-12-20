@@ -1,7 +1,10 @@
-﻿using System;
+﻿using CSharpTest.Net.Http;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 
@@ -9,173 +12,101 @@ namespace ru.pflb.VirtualController
 {
     public class VirtualController
     {
-
-        Thread thread1 = null;
-        ArrayList ThreadListRobots = new ArrayList();
-     //   bool firstrun = true;
-
         ArrayList ThreadListDBProcessors = new ArrayList();
         ArrayList RobotPorts = new ArrayList();
         ArrayList Robots = new ArrayList();
-
-        //     Dictionary<int, VirtualRobot> RobotPorts = new Dictionary<int, VirtualRobot>();
-
-        Exception myexp = new Exception("Thread shutdown");
+        ConcurrentQueue<string> VCQueue = new ConcurrentQueue<string>();
+        HttpServer server;
 
         int VCport;
         int VRCount;
-        int VRPorts;
-        int DBProcessorCount = 0;
-
-        ConcurrentQueue<string> VCQueue = new ConcurrentQueue<string>();
-
-        public VirtualController(int port, int VRPorts, ArrayList RobotPorts)
+        int DBProcessorCount;
+        
+        public VirtualController(int port,  ArrayList RobotPorts)
         {
             VCport = port;
-            this.VRPorts = VRPorts;
             this.RobotPorts = RobotPorts;
+            server = new HttpServer(10);
+            server.Start(new string[] { "http://*:" + port + "/" });
+            server.ProcessRequest += Server_ProcessRequest;
 
-            Thread VCThread = new Thread(() =>
-            {
-                HTTPListener_VirtualController HTTPListener = new HTTPListener_VirtualController();
-                HTTPListener.CreateListener(VCport, this);
-            });
-            VCThread.Name = "VirtualController_Thread";
-            VCThread.Start();
+            Console.WriteLine("VirtualController created on " + port);
         }
 
-        public void CreateRobots(int VRCount)
-
+        public void Server_ProcessRequest(object sender, HttpContextEventArgs e)
         {
+            // Note: The GetContext method blocks while waiting for a request.
+            HttpListenerContext context = e.Context;
+            HttpListenerRequest request = context.Request;
+            // Obtain a response object.
+            HttpListenerResponse response = context.Response;
+            // Construct a response.
 
+            NameValueCollection BodyCol = new NameValueCollection();
+            BodyCol = ConnectionHandler.KeysAndValuesFromBody(request.InputStream);
 
-
+            if (context.Request.LocalEndPoint.Port == VCport)
+            switch (context.Request.RawUrl)
+            {
+                default: ConnectionHandler.SimpleTextResponse(context, "I'm Virtual Controller"); break;
+                case "/CreateRobots/":
+                        ConnectionHandler.SimpleTextResponse(context, "CreatingRobots " + BodyCol.Get("count"));
+                    CreateRobots(Convert.ToInt32(BodyCol.Get("count")));
+                    break;
+                case "/StopRobots/":
+                        ConnectionHandler.SimpleTextResponse(context, "StoppingRobots " + BodyCol.Get("count"));
+                    StopRobots(Convert.ToInt32(BodyCol.Get("count")));
+                    break;
+                case "/Values/": ConnectionHandler.SimpleTextResponse(context, PrintValues()); break;
+            }
+        }
+        public void CreateRobots(int VRCount)
+        {
             for (int i = 0; i < VRCount; i++)
             {
-
                 if (RobotPorts.Count > 0)
                 {
-
                     int port = (int)RobotPorts[0];
                     RobotPorts.Remove(port);
-                    VirtualRobot VR = new VirtualRobot(port, Convert.ToString(port), VCQueue);
-                    Thread thread = new Thread(VR.VRThread);
-                    thread.Name = "VR_" + VR.id;
-                    VR.thread = thread;
-                    ThreadListRobots.Add(thread);
-
-                    if (thread1 is null)
-                    thread1 = thread;
-
-
+                    VirtualRobot VR = new VirtualRobot(port, Convert.ToString(port), VCQueue, server);                    
+                    server.Start(new string[] { "http://*:" + port + "/" });
                     Robots.Add(VR);
-                    //   VRPortsCount++;
                 }
                 else
                     Console.WriteLine("RobotPorts Array is Empty");
             }
-
-            foreach (Thread thread in ThreadListRobots)
-            {
-                if (!(thread.IsAlive))
-                {
-                    try
-                    {
-                        thread.Start();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                }
-            }
             this.VRCount = this.VRCount + VRCount;
         }
-
-
-
         public void StopRobots(int VRCount)
 
         {
-            foreach (VirtualRobot VR in Robots)
-            {
-                Console.WriteLine("RobotPorts.Count: " + RobotPorts.Count + " Robots Count: " + Robots.Count + " VR " + VR.id);
-            }
-
-            PrintValues();
-
-
+            string[] prefixesToRemove = new string[VRCount];
 
             for (int i = 0; i < VRCount; i++)
             {
                 if (Robots.Count > 0)
                 {
-
                     VirtualRobot VR = (VirtualRobot)Robots[Robots.Count - 1];
-                    Robots.Remove(VR);
-                    ThreadListRobots.Remove(VR.thread);
-
+                    prefixesToRemove[i] = "http://*:" + VR.port + "/";
+                    Robots.Remove(VR);                    
                     RobotPorts.Add(VR.port);
                     RobotPorts.Sort();
-
                     Console.WriteLine("Robot " + VR.port + " stopped " + Robots.Count + " left");
-                    Console.WriteLine("VR.isFinished " + VR.isFinished);
-                    
-                    //  Thread.Sleep(5000);
-                    //   FieldInfo f = VR.HTTPListener_Robot.listener.GetType().GetField("_state", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                    //   Console.WriteLine(f.GetValue(VR.HTTPListener_Robot.listener));
-                    //  Thread.Sleep(500);
-          //       VR.HTTPListener_Robot.listener.Stop();
-                    //     f = VR.HTTPListener_Robot.listener.GetType().GetField("_state", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                    //     Console.WriteLine(f.GetValue(VR.HTTPListener_Robot.listener));
-                    ////  Thread.Sleep(500);/*/*
-           //         VR.HTTPListener_Robot.listener.Abort();
-                    //  f = VR.HTTPListener_Robot.listener.GetType().GetField("_state", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                    //  Console.WriteLine(f.GetValue(VR.HTTPListener_Robot.listener));
-                    ////  Thread.Sleep(500);
-                    //VR.HTTPListener_Robot.listener.Close();
-                    //  f = VR.HTTPListener_Robot.listener.GetType().GetField("_state", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                    //   Console.WriteLine(f.GetValue(VR.HTTPListener_Robot.listener));*/*/
-
-                    //    VR.HTTPListener_Robot = null;
-
-
-                    VR.StopThread();
-
-                    Console.WriteLine("VR.isFinished " + VR.isFinished);
-                //    VR = null;
-
-             //       throw (myexp);
                 }
                 else
                     Console.WriteLine("No Robots left");
             }
 
-            this.VRCount = this.VRCount - VRCount;
+            server.RemovePrefixes(prefixesToRemove);
 
+            this.VRCount = this.VRCount - VRCount;
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.WaitForFullGCComplete();
             GC.Collect();
-            
         }
 
-        public void PrintDebug()
-        {
-         
-          
-              while (true)
-              {
-                  foreach (Thread thread in ThreadListRobots)
-                  {
-                     Console.WriteLine(thread.Name + " " + thread.ThreadState);
-                }
-                Thread.Sleep(1000);
-             }
-        }
-
-        public void CreateDBProcessor(int DBProcessorCount, string DataSource, string UserID, string Password, string InitialCatalog)
-
+        public void CreateDBSender(int DBProcessorCount, string DataSource, string UserID, string Password, string InitialCatalog)
         {
             for (int i = 0; i < DBProcessorCount; i++)
             {
@@ -188,7 +119,6 @@ namespace ru.pflb.VirtualController
                 th.Start();
                 ThreadListDBProcessors.Add(th);
             }
-
             this.DBProcessorCount = this.DBProcessorCount + DBProcessorCount;
         }
 
@@ -196,10 +126,9 @@ namespace ru.pflb.VirtualController
         public string PrintValues()
         {
             Console.WriteLine("Virtual Controller port = " + VCport);
-            Console.WriteLine("1st Virtual Robot = " + VRPorts);
-            Console.WriteLine("Robot count = " + Robots.Count);
+            Console.WriteLine("Robots count = " + Robots.Count);
 
-            return "Virtual Controller port = " + VCport + "\n1st Virtual Robot = " + VRPorts + "\nRobot count = " + VRCount + "";
+            return "Virtual Controller port = " + VCport + "\nRobots count = " + VRCount + "";
         }
 
     }
