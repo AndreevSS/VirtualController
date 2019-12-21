@@ -54,26 +54,30 @@ namespace ru.pflb.VirtualController
             Properties.TryGetValue("Password", out Password);
 
             Properties.TryGetValue("InitialCatalog", out InitialCatalog);
-                     
-            ArrayList RobotPorts = new ArrayList();
+
+            List<int> RobotPorts = new List<int>();
             
             RobotPorts = GeneratePorts(VirtualRobots_FirstPort, VirtualRobots_LastPort);
         
             
 
-            VirtualController VC = new VirtualController(VirtualController_Port, RobotPorts);            
+            VirtualController VC = new VirtualController(VirtualController_Port, RobotPorts);
             VC.CreateDBSender(DBProcessors_Count, DataSource, UserID, Password, InitialCatalog);
-   
+            VC.CreateDBSender(DBProcessors_Count, DataSource, UserID, Password, InitialCatalog);
+            VC.CreateDBSender(DBProcessors_Count, DataSource, UserID, Password, InitialCatalog);
+            // VC.Reset();
+            Console.WriteLine(   VC.getFreePort());
+
         }
 
-        public static ArrayList GeneratePorts(int firstport, int lastport)
+        public static List<int> GeneratePorts(int firstport, int lastport)
         {
             // Dictionary<int, VirtualRobot> PortsDictionary = new Dictionary<int, VirtualRobot>();
-            ArrayList PortsDictionary = new ArrayList();
+            List<int> Ports = new List<int>();
             int i = firstport;
             while (i <= lastport)
-                PortsDictionary.Add(i++);
-            return PortsDictionary;
+                Ports.Add(i++);
+            return Ports;
         }
 
         public static IDictionary ReadDictionaryFile(string fileName)

@@ -4,34 +4,44 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ru.pflb.VirtualController
 {
     public class VirtualController
     {
         ArrayList ThreadListDBProcessors = new ArrayList();
-        ArrayList RobotPorts = new ArrayList();
-        ArrayList Robots = new ArrayList();
+        public List<int> RobotPorts;
+        public Thread mainThread;
+        //  ArrayList Robots = new ArrayList();
+
+        Dictionary<int, VirtualRobot> Robots = new Dictionary<int, VirtualRobot>();
+
         ConcurrentQueue<string> VCQueue = new ConcurrentQueue<string>();
         HttpServer server;
 
-        int VCport;
         int VRCount;
+        int VCport;
         int DBProcessorCount;
-        
-        public VirtualController(int port,  ArrayList RobotPorts)
-        {
-            VCport = port;
-            this.RobotPorts = RobotPorts;
-            server = new HttpServer(10);
-            server.Start(new string[] { "http://*:" + port + "/" });
-            server.ProcessRequest += Server_ProcessRequest;
 
+        public VirtualController(int port, List<int> RobotPorts)
+        {
+            this.VCport = port;
+            this.RobotPorts = RobotPorts;
+            this.mainThread = Thread.CurrentThread;
+
+            StartServer();
+            
             Console.WriteLine("VirtualController created on " + port);
+
+            Console.WriteLine(RobotPorts.Contains(VCport));
+
         }
+
 
         public void Server_ProcessRequest(object sender, HttpContextEventArgs e)
         {
@@ -42,66 +52,128 @@ namespace ru.pflb.VirtualController
             HttpListenerResponse response = context.Response;
             // Construct a response.
 
+            long start = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            if (context.Request.LocalEndPoint.Port == VCport)
+            {
+                ControllerRequest(context);
+            };
+
+             
+            if (Robots.ContainsKey(context.Request.LocalEndPoint.Port))
+            {
+                VirtualRobot VR = Robots[context.Request.LocalEndPoint.Port];
+                VR.RobotRequest(context);
+            }
+
+            Console.WriteLine(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - start);
+
+        }
+
+        public void ControllerRequest(HttpListenerContext context)
+        {
+            HttpListenerRequest request = context.Request;
+
             NameValueCollection BodyCol = new NameValueCollection();
             BodyCol = ConnectionHandler.KeysAndValuesFromBody(request.InputStream);
 
-            if (context.Request.LocalEndPoint.Port == VCport)
-            switch (context.Request.RawUrl)
+            switch (context.Request.RawUrl.ToLower())
             {
                 default: ConnectionHandler.SimpleTextResponse(context, "I'm Virtual Controller"); break;
-                case "/CreateRobots/":
-                        ConnectionHandler.SimpleTextResponse(context, "CreatingRobots " + BodyCol.Get("count"));
+                case "/createrobots/":
+                    ConnectionHandler.SimpleTextResponse(context, "CreatingRobots " + BodyCol.Get("count"));
                     CreateRobots(Convert.ToInt32(BodyCol.Get("count")));
                     break;
-                case "/StopRobots/":
-                        ConnectionHandler.SimpleTextResponse(context, "StoppingRobots " + BodyCol.Get("count"));
+                case "/reset/":                    
+                    ConnectionHandler.SimpleTextResponse(context, "reseting");
+                  //Thread.CurrentThread.Join();
+                    new Thread(Reset).Start();
+                    //th.Start();                    
+                  // Reset();
+                    break;
+                case "/stoprobots/":
+                    ConnectionHandler.SimpleTextResponse(context, "StoppingRobots " + BodyCol.Get("count"));
                     StopRobots(Convert.ToInt32(BodyCol.Get("count")));
                     break;
-                case "/Values/": ConnectionHandler.SimpleTextResponse(context, PrintValues()); break;
+                case "/values/": ConnectionHandler.SimpleTextResponse(context, PrintValues()); break;
             }
         }
         public void CreateRobots(int VRCount)
         {
-            string[] prefixesToAdd = new string[VRCount];
 
             for (int i = 0; i < VRCount; i++)
             {
-                if (RobotPorts.Count > 0)
-                {
-                    int port = (int)RobotPorts[0];
-                    RobotPorts.Remove(port);
-                    VirtualRobot VR = new VirtualRobot(port, Convert.ToString(port), VCQueue, server);
-                    prefixesToAdd[i] = "http://*:" + VR.port + "/";
-                    Robots.Add(VR);
-                }
-                else
-                    Console.WriteLine("RobotPorts Array is Empty");
+                int port = getFreePort();
+                VirtualRobot VR = new VirtualRobot(port, Convert.ToString(port), VCQueue, server);
+                Robots.Add(port, VR);
             }
 
-            server.Start(new string[] { "prefixesToAdd" });
             this.VRCount = this.VRCount + VRCount;
+        }
+
+        public int getFreePort()
+        {
+            
+            List<int> occupiedPorts = Robots.Select(k => k.Key).ToList();
+            var freePorts = RobotPorts.Except(occupiedPorts);
+            return freePorts.Min();
+
+        }
+
+        public void StartServer()
+        {
+            server = new HttpServer(100);
+            List<string> prefixes = new List<string>();
+
+            prefixes = RobotPorts.ConvertAll<string>(x => "http://*:" + x.ToString() + "/");
+            prefixes.Add("http://*:" + Convert.ToString(VCport) + "/");
+            server.Start(prefixes.ToArray());
+            server.ProcessRequest += Server_ProcessRequest;
+
+        }
+
+        public void Reset()
+        {
+            Thread.Sleep(500);
+            server.Stop();
+            Robots.Clear();
+
+            Console.WriteLine("server is down");
+
+            Thread.Sleep(5000);
+            
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.WaitForFullGCComplete();
+            GC.Collect();
+
+            StartServer();
+
+            Console.WriteLine("server is up");
+
+            Thread.CurrentThread.Join();
+
+            
+
         }
         public void StopRobots(int VRCount)
 
         {
-            string[] prefixesToRemove = new string[VRCount];
 
             for (int i = 0; i < VRCount; i++)
             {
                 if (Robots.Count > 0)
                 {
-                    VirtualRobot VR = (VirtualRobot)Robots[Robots.Count - 1];
-                    prefixesToRemove[i] = "http://*:" + VR.port + "/";
-                    Robots.Remove(VR);                    
-                    RobotPorts.Add(VR.port);
-                    RobotPorts.Sort();
+                    VirtualRobot VR = Robots.First().Value;
+                    Robots.Remove(VR.port);
                     Console.WriteLine("Robot " + VR.port + " stopped " + Robots.Count + " left");
                 }
                 else
+                {
                     Console.WriteLine("No Robots left");
+                    break;
+                }
             }
-
-            server.RemovePrefixes(prefixesToRemove);
 
             this.VRCount = this.VRCount - VRCount;
             GC.Collect();
@@ -125,7 +197,6 @@ namespace ru.pflb.VirtualController
             }
             this.DBProcessorCount = this.DBProcessorCount + DBProcessorCount;
         }
-
 
         public string PrintValues()
         {

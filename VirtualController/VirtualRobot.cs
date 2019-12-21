@@ -31,19 +31,14 @@ namespace ru.pflb.VirtualController
             this.token = null;
             this.VCQueue = VCQueue;
             this.server = server;
-            server.ProcessRequest += Server_ProcessRequest;
-
-            Console.WriteLine("VirtualController created on " + port);
+          
+            Console.WriteLine("VirtualRobot created on " + port);
         }
 
 
-        public void Server_ProcessRequest(object sender, HttpContextEventArgs e)
+        public void RobotRequest(HttpListenerContext context)
         {
-            // Note: The GetContext method blocks while waiting for a request.
-            HttpListenerContext context = e.Context;
             HttpListenerRequest request = context.Request;
-            // Obtain a response object.
-            HttpListenerResponse response = context.Response;
             // Construct a response.
             NameValueCollection BodyCol = new NameValueCollection();
             BodyCol = ConnectionHandler.KeysAndValuesFromBody(request.InputStream);
@@ -132,7 +127,13 @@ namespace ru.pflb.VirtualController
             }
 
             token = Result;
+
+            long start = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            
+            
             VCQueue.Enqueue(DBQueries.CreateToken(userid, token));
+            Console.WriteLine("VCQueue.Enqueue: " + (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - start));
+
 
             return UserID + "" + token;
             //   SimpleTextResponse(context, UserID + "" + VR.token);
@@ -140,7 +141,7 @@ namespace ru.pflb.VirtualController
         string CreateSession(int time, int duration, ConcurrentQueue<string> VCQueue, string userid)
         {
             String sessionid = Guid.NewGuid().ToString();
-            Thread.Sleep(rnd.Next(50));
+           // Thread.Sleep(rnd.Next(50));
             VS = new VirtualSession (sessionid, time, duration, 0);
             VCQueue.Enqueue(DBQueries.CreateSession(sessionid, processid, userid, id));
 
@@ -156,7 +157,7 @@ namespace ru.pflb.VirtualController
             if (!(VS is null) && VS.status != 2)
             {
 
-                Thread.Sleep(rnd.Next(50));
+           //     Thread.Sleep(rnd.Next(50));
 
                 VS.Start(VCQueue);
 

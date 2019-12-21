@@ -129,6 +129,7 @@ namespace CSharpTest.Net.Http
             for (int i = 0; i < _workers.Length; i++)
             {
                 _workers[i] = new Thread(Worker);
+                _workers[i].Name = "Worker" + i;
                 _workers[i].Start();
             }
         }
