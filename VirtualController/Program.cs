@@ -21,10 +21,12 @@ namespace ru.pflb.VirtualController
             string[] DBData = new string[4]; //"DataSource", "UserID", "Password", "InitialCatalog"
 
             Dictionary<string, string> Properties = new Dictionary<string, string>();
-            Properties = (Dictionary<string, string>)ReadDictionaryFile("Properties.txt");
-
+            
             try
             {
+                Properties = (Dictionary<string, string>)ReadDictionaryFile("Properties.txt");
+
+
                 VirtualController_Port = Convert.ToInt32(Properties["VirtualController_Port"]);
                 DBProcessors_Count = Convert.ToInt32(Properties["DBProcessors_Count"]);
                 VRPorts[0] = Convert.ToInt32(Properties["VirtualRobots_FirstPort"]);
@@ -42,11 +44,17 @@ namespace ru.pflb.VirtualController
                 VC.CreateDBSender(DBProcessors_Count);
 
             }
-            catch (ArgumentNullException e)
+            catch (KeyNotFoundException e)
             {
                 Console.WriteLine(e);
-                Console.WriteLine("Properties.txt имеет неверный формат");
+                Console.WriteLine("\n\rProperties.txt имеет неверный формат");
             }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine(e);
+                Console.WriteLine("\n\rProperties.txt не найден");
+            }
+
 
 
         }
