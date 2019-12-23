@@ -7,66 +7,47 @@ using System.Threading;
 
 namespace ru.pflb.VirtualController
 {
+
     class Program
     {
+
+
         static void Main(string[] args)
         {
 
-            //load
-            //     Properties properties = new Properties("Properties.txt");
-            //get value whith default value
-            //     string Text = properties.get("VirtualController_Port");
-            Dictionary<string, string> Properties = new Dictionary<string, string>();
-
-            Properties = (Dictionary<string, string>) ReadDictionaryFile("Properties.txt");
-
-
             int VirtualController_Port = 0;
-            
             int DBProcessors_Count = 0;
-            int VirtualRobots_FirstPort = 0;
-            int VirtualRobots_LastPort = 0;
+            int[] VRPorts = new int[2]; //FirstPort, LastPort
+            string[] DBData = new string[4]; //"DataSource", "UserID", "Password", "InitialCatalog"
 
-            String DataSource;
-            String UserID;
-            String Password;
-            String InitialCatalog;
+            Dictionary<string, string> Properties = new Dictionary<string, string>();
+            Properties = (Dictionary<string, string>)ReadDictionaryFile("Properties.txt");
 
+            try
+            {
+                VirtualController_Port = Convert.ToInt32(Properties["VirtualController_Port"]);
+                DBProcessors_Count = Convert.ToInt32(Properties["DBProcessors_Count"]);
+                VRPorts[0] = Convert.ToInt32(Properties["VirtualRobots_FirstPort"]);
+                VRPorts[1] = Convert.ToInt32(Properties["VirtualRobots_LastPort"]);
 
-            Properties.TryGetValue("VirtualController_Port", out string Result);
-            VirtualController_Port = Convert.ToInt32(Result);
+                DBData[0] = Properties["DataSource"];
+                DBData[1] = Properties["UserID"];
+                DBData[2] = Properties["Password"];
+                DBData[3] = Properties["InitialCatalog"];
 
-            Properties.TryGetValue("DBProcessors_Count", out Result);
-            DBProcessors_Count = Convert.ToInt32(Result);
+                List<int> RobotPorts = GeneratePorts(VRPorts[0], VRPorts[1]);
+                List<DBSender> DBSenders = new List<DBSender>();
 
+                VirtualController VC = new VirtualController(VirtualController_Port, RobotPorts, DBData, DBSenders);
+                VC.CreateDBSender(DBProcessors_Count);
 
-            Properties.TryGetValue("VirtualRobots_FirstPort", out Result);
-            VirtualRobots_FirstPort = Convert.ToInt32(Result);
+            }
+            catch (ArgumentNullException e)
+            {
+                Console.WriteLine(e);
+                Console.WriteLine("Properties.txt имеет неверный формат");
+            }
 
-            Properties.TryGetValue("VirtualRobots_LastPort", out Result);
-            VirtualRobots_LastPort = Convert.ToInt32(Result);
-          
-
-            Properties.TryGetValue("DataSource", out DataSource);
-           
-            Properties.TryGetValue("UserID", out UserID);
-
-            Properties.TryGetValue("Password", out Password);
-
-            Properties.TryGetValue("InitialCatalog", out InitialCatalog);
-
-            List<int> RobotPorts = new List<int>();
-            
-            RobotPorts = GeneratePorts(VirtualRobots_FirstPort, VirtualRobots_LastPort);
-        
-            
-
-            VirtualController VC = new VirtualController(VirtualController_Port, RobotPorts);
-            VC.CreateDBSender(DBProcessors_Count, DataSource, UserID, Password, InitialCatalog);
-            VC.CreateDBSender(DBProcessors_Count, DataSource, UserID, Password, InitialCatalog);
-            VC.CreateDBSender(DBProcessors_Count, DataSource, UserID, Password, InitialCatalog);
-            // VC.Reset();
-            Console.WriteLine(   VC.getFreePort());
 
         }
 
@@ -106,7 +87,6 @@ namespace ru.pflb.VirtualController
 
             return dictionary;
         }
-
 
     }
 }

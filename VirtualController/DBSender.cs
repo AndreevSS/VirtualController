@@ -6,21 +6,25 @@ using System.Threading;
 
 namespace ru.pflb.VirtualController
 {
-    class DBSender
+    public class DBSender
     {
+        public bool isStopped;
         SqlConnection connection;
-        public DBSender(string DataSource, string UserID, string Password, string InitialCatalog)
+        public DBSender(string[] DBData)
         {
+            isStopped = false;
             try
             {
                 SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-                builder.DataSource = DataSource;
-                builder.UserID = UserID;
-                builder.Password = Password;
-                builder.InitialCatalog = InitialCatalog;
+                builder.DataSource = DBData[0];
+                builder.UserID = DBData[1];
+                builder.Password = DBData[2];
+                builder.InitialCatalog = DBData[3];
 
                 connection = new SqlConnection(builder.ConnectionString);
                 connection.Open();
+
+         //       Console.WriteLine(Thread.CurrentThread.Name + " created");
             }
             catch (SqlException e)
             {
@@ -31,7 +35,7 @@ namespace ru.pflb.VirtualController
         public void StartSender(ConcurrentQueue<string> VCQueue)
         {
             //connection.Open();
-            while (true)
+            while (!isStopped)
             {
 
                 
@@ -61,6 +65,7 @@ namespace ru.pflb.VirtualController
                 Thread.Sleep(10);
             }
             connection.Close();
+            Console.WriteLine(Thread.CurrentThread.Name + " stopped");
         }
     }
 }

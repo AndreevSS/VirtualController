@@ -14,11 +14,13 @@ namespace ru.pflb.VirtualController
 {
     public class VirtualController
     {
-        ArrayList ThreadListDBProcessors = new ArrayList();
+        
         public List<int> RobotPorts;
+        public List<DBSender> DBSenders;
         public Thread mainThread;
-        //  ArrayList Robots = new ArrayList();
 
+        string[] DBData = new string[4];
+        
         Dictionary<int, VirtualRobot> Robots = new Dictionary<int, VirtualRobot>();
 
         ConcurrentQueue<string> VCQueue = new ConcurrentQueue<string>();
@@ -26,16 +28,17 @@ namespace ru.pflb.VirtualController
 
         int VRCount;
         int VCport;
-        int DBProcessorCount;
-
-        public VirtualController(int port, List<int> RobotPorts)
+        
+        public VirtualController(int port, List<int> RobotPorts, string[] DBData, List<DBSender> DBSenders)
         {
             this.VCport = port;
             this.RobotPorts = RobotPorts;
+            this.DBSenders = DBSenders;
             this.mainThread = Thread.CurrentThread;
+            this.DBData = DBData;
 
             StartServer();
-            
+
             Console.WriteLine("VirtualController created on " + port);
 
             Console.WriteLine(RobotPorts.Contains(VCport));
@@ -59,7 +62,7 @@ namespace ru.pflb.VirtualController
                 ControllerRequest(context);
             };
 
-             
+
             if (Robots.ContainsKey(context.Request.LocalEndPoint.Port))
             {
                 VirtualRobot VR = Robots[context.Request.LocalEndPoint.Port];
@@ -83,19 +86,16 @@ namespace ru.pflb.VirtualController
                 case "/createrobots/":
                     ConnectionHandler.SimpleTextResponse(context, "CreatingRobots " + BodyCol.Get("count"));
                     CreateRobots(Convert.ToInt32(BodyCol.Get("count")));
-                    break;
-                case "/reset/":                    
+                   break;
+                case "/reset/":
                     ConnectionHandler.SimpleTextResponse(context, "reseting");
-                  //Thread.CurrentThread.Join();
                     new Thread(Reset).Start();
-                    //th.Start();                    
-                  // Reset();
                     break;
-                case "/stoprobots/":
-                    ConnectionHandler.SimpleTextResponse(context, "StoppingRobots " + BodyCol.Get("count"));
-                    StopRobots(Convert.ToInt32(BodyCol.Get("count")));
+                case "/createdbsender/":
+                    ConnectionHandler.SimpleTextResponse(context, "Creating DB Senders" + BodyCol.Get("count"));
+                    CreateDBSender(Convert.ToInt32(BodyCol.Get("count")));
                     break;
-                case "/values/": ConnectionHandler.SimpleTextResponse(context, PrintValues()); break;
+                //case "/values/": ConnectionHandler.SimpleTextResponse(context, PrintValues()); break;
             }
         }
         public void CreateRobots(int VRCount)
@@ -113,7 +113,7 @@ namespace ru.pflb.VirtualController
 
         public int getFreePort()
         {
-            
+
             List<int> occupiedPorts = Robots.Select(k => k.Key).ToList();
             var freePorts = RobotPorts.Except(occupiedPorts);
             return freePorts.Min();
@@ -132,77 +132,59 @@ namespace ru.pflb.VirtualController
 
         }
 
+        public void ClearDBSenders()
+        {
+            foreach (DBSender DBSender in DBSenders)
+            {
+                DBSender.isStopped = true;
+            }
+            DBSenders.Clear();
+        }
+
         public void Reset()
         {
             Thread.Sleep(500);
             server.Stop();
-            Robots.Clear();
-
             Console.WriteLine("server is down");
 
+            Robots.Clear();
+            Console.WriteLine("robots are cleared");
+
+            ClearDBSenders();
+            Console.WriteLine("DBSenders are cleared");
+
             Thread.Sleep(5000);
-            
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.WaitForFullGCComplete();
             GC.Collect();
-
             StartServer();
-
             Console.WriteLine("server is up");
-
             Thread.CurrentThread.Join();
 
-            
-
         }
-        public void StopRobots(int VRCount)
-
-        {
-
-            for (int i = 0; i < VRCount; i++)
-            {
-                if (Robots.Count > 0)
-                {
-                    VirtualRobot VR = Robots.First().Value;
-                    Robots.Remove(VR.port);
-                    Console.WriteLine("Robot " + VR.port + " stopped " + Robots.Count + " left");
-                }
-                else
-                {
-                    Console.WriteLine("No Robots left");
-                    break;
-                }
-            }
-
-            this.VRCount = this.VRCount - VRCount;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.WaitForFullGCComplete();
-            GC.Collect();
-        }
-
-        public void CreateDBSender(int DBProcessorCount, string DataSource, string UserID, string Password, string InitialCatalog)
+        public void CreateDBSender(int DBProcessorCount)
         {
             for (int i = 0; i < DBProcessorCount; i++)
             {
+                DBSender DBSender = new DBSender(DBData);
+                DBSenders.Add(DBSender);
+
                 Thread th = new Thread(() =>
                 {
-                    DBSender DBSender = new DBSender(DataSource, UserID, Password, InitialCatalog);
                     DBSender.StartSender(VCQueue);
+                    
                 });
-                th.Name = "DBProcessor_" + (this.DBProcessorCount + i);
-                th.Start();
-                ThreadListDBProcessors.Add(th);
+                th.Name = "DBSender_" + (DBSenders.Count);
+                Console.WriteLine(th.Name + " created");
+                th.Start();    
             }
-            this.DBProcessorCount = this.DBProcessorCount + DBProcessorCount;
         }
 
         public string PrintValues()
         {
             Console.WriteLine("Virtual Controller port = " + VCport);
             Console.WriteLine("Robots count = " + Robots.Count);
-
             return "Virtual Controller port = " + VCport + "\nRobots count = " + VRCount + "";
         }
 
