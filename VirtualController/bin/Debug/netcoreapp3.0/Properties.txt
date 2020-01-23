@@ -1,6 +1,7 @@
 VirtualController_Port=8800
 VirtualRobots_Count = 1
-DBProcessors_Count = 5
+DBProcessors_Count = 0
+Robots_Count = 5
 VirtualRobots_FirstPort = 10900
 VirtualRobots_LastPort = 19900
 DataSource = "DESKTOP-4BU392E"

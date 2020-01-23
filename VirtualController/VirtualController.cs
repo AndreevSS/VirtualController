@@ -12,35 +12,60 @@ using System.Threading.Tasks;
 
 namespace ru.pflb.VirtualController
 {
+    public class DBQueueObject
+    {
+        public VirtualRobot VR;
+        public String Query;
+        public bool needupdate;
+        public DBQueueObject(VirtualRobot VR)
+        {
+            this.VR = VR;
+            this.needupdate = false;
+            this.Query = "";
+
+        }
+    }
     public class VirtualController
     {
-        
+
         public List<int> RobotPorts;
         public List<DBSender> DBSenders;
-        public Thread mainThread;
 
         string[] DBData = new string[4];
-        
+
         Dictionary<int, VirtualRobot> Robots = new Dictionary<int, VirtualRobot>();
 
-        ConcurrentQueue<string> VCQueue = new ConcurrentQueue<string>();
+        public ArrayList TT = new ArrayList();
+
+
+
+
+        ConcurrentQueue<DBQueueObject> VCQueue = new ConcurrentQueue<DBQueueObject>();
         HttpServer server;
 
         int VRCount;
         int VCport;
-        
-        public VirtualController(int port, List<int> RobotPorts, string[] DBData, List<DBSender> DBSenders)
+        bool isCreatingRobots;
+
+        public VirtualController(int VCport, List<int> RobotPorts, string[] DBData, List<DBSender> DBSenders)
         {
-            this.VCport = port;
+            this.VCport = VCport;
             this.RobotPorts = RobotPorts;
             this.DBSenders = DBSenders;
-            this.mainThread = Thread.CurrentThread;
             this.DBData = DBData;
+            this.isCreatingRobots = false;
 
             StartServer();
 
-            Console.WriteLine("VirtualController created on " + port);
+            DBQueueObject dBQueueObject = new DBQueueObject(null);
+            dBQueueObject.Query = DBQueries.RebuildSessions();
+            VCQueue.Enqueue(dBQueueObject);
 
+            //();
+
+            new Thread(BPAResourceUpdater).Start();
+
+            Console.WriteLine("VirtualController created on " + VCport);
             Console.WriteLine(RobotPorts.Contains(VCport));
 
         }
@@ -54,6 +79,10 @@ namespace ru.pflb.VirtualController
             // Obtain a response object.
             HttpListenerResponse response = context.Response;
             // Construct a response.
+
+            //        Console.WriteLine(context.Request.Url);
+            // Console.WriteLine(context.Request.RawUrl);
+            //        Console.WriteLine(context.Request.QueryString.ToString());
 
             long start = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
@@ -69,7 +98,7 @@ namespace ru.pflb.VirtualController
                 VR.RobotRequest(context);
             }
 
-            Console.WriteLine(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - start);
+            //       Console.WriteLine(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - start);
 
         }
 
@@ -86,7 +115,7 @@ namespace ru.pflb.VirtualController
                 case "/createrobots/":
                     ConnectionHandler.SimpleTextResponse(context, "CreatingRobots " + BodyCol.Get("count"));
                     CreateRobots(Convert.ToInt32(BodyCol.Get("count")));
-                   break;
+                    break;
                 case "/reset/":
                     ConnectionHandler.SimpleTextResponse(context, "reseting");
                     new Thread(Reset).Start();
@@ -95,20 +124,23 @@ namespace ru.pflb.VirtualController
                     ConnectionHandler.SimpleTextResponse(context, "Creating DB Senders" + BodyCol.Get("count"));
                     CreateDBSender(Convert.ToInt32(BodyCol.Get("count")));
                     break;
-                //case "/values/": ConnectionHandler.SimpleTextResponse(context, PrintValues()); break;
+                    //case "/values/": ConnectionHandler.SimpleTextResponse(context, PrintValues()); break;
             }
         }
         public void CreateRobots(int VRCount)
         {
+            isCreatingRobots = true;
 
             for (int i = 0; i < VRCount; i++)
             {
                 int port = getFreePort();
-                VirtualRobot VR = new VirtualRobot(port, Convert.ToString(port), VCQueue, server);
+                VirtualRobot VR = new VirtualRobot(port, VCQueue, server);
                 Robots.Add(port, VR);
             }
 
             this.VRCount = this.VRCount + VRCount;
+
+            isCreatingRobots = false;
         }
 
         public int getFreePort()
@@ -124,6 +156,7 @@ namespace ru.pflb.VirtualController
         {
             server = new HttpServer(100);
             List<string> prefixes = new List<string>();
+
 
             prefixes = RobotPorts.ConvertAll<string>(x => "http://*:" + x.ToString() + "/");
             prefixes.Add("http://*:" + Convert.ToString(VCport) + "/");
@@ -173,20 +206,37 @@ namespace ru.pflb.VirtualController
                 Thread th = new Thread(() =>
                 {
                     DBSender.StartSender(VCQueue);
-                    
+
                 });
                 th.Name = "DBSender_" + (DBSenders.Count);
                 Console.WriteLine(th.Name + " created");
-                th.Start();    
+                th.Start();
             }
         }
-
-        public string PrintValues()
+        public void BPAResourceUpdater()
         {
-            Console.WriteLine("Virtual Controller port = " + VCport);
-            Console.WriteLine("Robots count = " + Robots.Count);
-            return "Virtual Controller port = " + VCport + "\nRobots count = " + VRCount + "";
-        }
+            while (true)
+            {
+                try
+                { 
+                    DBQueueObject DBQueueObject = new DBQueueObject(null);
+                    DBQueueObject.Query = DBQueries.UpdateBPAResourcesLastUpdated();
+                    VCQueue.Enqueue(DBQueueObject);
+                }
+                catch (Exception e)
+                { Console.WriteLine(e); }
+                Thread.Sleep(10000);
+            }
 
+        }
+    
+
+    public string PrintValues()
+    {
+        Console.WriteLine("Virtual Controller port = " + VCport);
+        Console.WriteLine("Robots count = " + Robots.Count);
+        return "Virtual Controller port = " + VCport + "\nRobots count = " + VRCount + "";
     }
+
 }
+    }

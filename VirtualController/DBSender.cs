@@ -8,6 +8,7 @@ namespace ru.pflb.VirtualController
 {
     public class DBSender
     {
+        Random rnd = new Random();
         public bool isStopped;
         SqlConnection connection;
         public DBSender(string[] DBData)
@@ -28,11 +29,24 @@ namespace ru.pflb.VirtualController
             }
             catch (SqlException e)
             {
-                Console.WriteLine(e.ToString());
+                Console.ForegroundColor = ConsoleColor.Red;
+                DisplaySqlErrors(e);
             }
-            Thread.Sleep(10);
+            Thread.Sleep(1);
         }
-        public void StartSender(ConcurrentQueue<string> VCQueue)
+
+        private static void DisplaySqlErrors(SqlException exception)
+        {
+            for (int i = 0; i < exception.Errors.Count; i++)
+            {
+                
+                Console.WriteLine("Index #" + i + "\n" +
+                    "Error: " + exception.Errors[i].ToString() + "\n");
+            }
+            Console.ReadLine();
+        }
+
+        public void StartSender(ConcurrentQueue<DBQueueObject> VCQueue)
         {
             //connection.Open();
             while (!isStopped)
@@ -41,9 +55,15 @@ namespace ru.pflb.VirtualController
                 
                 while (!VCQueue.IsEmpty)
                 {
-                    if (VCQueue.TryDequeue(out string Result))
+                    if (VCQueue.TryDequeue(out DBQueueObject resultObject))
                     {
+                        if (resultObject.needupdate)
+                        {
+                            resultObject.VR.dbready = false;
+                        }
 
+
+                        String Result = resultObject.Query;
                         Console.WriteLine(DateTime.Now + ": VCQueue.count=" + VCQueue.Count + " Thread " + Thread.CurrentThread.Name + " Dequeuing '{0}'", Result);
                         StringBuilder sb = new StringBuilder();
                         sb.Append(Result);
@@ -54,6 +74,12 @@ namespace ru.pflb.VirtualController
                         SqlDataReader reader = command.ExecuteReader();
                         reader.Close();
 
+                        if (resultObject.needupdate)
+                        {
+                            resultObject.VR.dbready = true;
+                        }
+
+
                         Console.WriteLine("DB: "+ (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - start) );
                     }
 
@@ -62,7 +88,7 @@ namespace ru.pflb.VirtualController
                     GC.Collect();
 
                 }
-                Thread.Sleep(10);
+                Thread.Sleep(1);
             }
             connection.Close();
             Console.WriteLine(Thread.CurrentThread.Name + " stopped");

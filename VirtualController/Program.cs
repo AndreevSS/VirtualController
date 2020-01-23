@@ -17,6 +17,7 @@ namespace ru.pflb.VirtualController
 
             int VirtualController_Port = 0;
             int DBProcessors_Count = 0;
+            int Robots_Count = 0;
             int[] VRPorts = new int[2]; //FirstPort, LastPort
             string[] DBData = new string[4]; //"DataSource", "UserID", "Password", "InitialCatalog"
 
@@ -26,9 +27,10 @@ namespace ru.pflb.VirtualController
             {
                 Properties = (Dictionary<string, string>)ReadDictionaryFile("Properties.txt");
 
-
                 VirtualController_Port = Convert.ToInt32(Properties["VirtualController_Port"]);
                 DBProcessors_Count = Convert.ToInt32(Properties["DBProcessors_Count"]);
+                Robots_Count = Convert.ToInt32(Properties["Robots_Count"]);
+
                 VRPorts[0] = Convert.ToInt32(Properties["VirtualRobots_FirstPort"]);
                 VRPorts[1] = Convert.ToInt32(Properties["VirtualRobots_LastPort"]);
 
@@ -42,6 +44,7 @@ namespace ru.pflb.VirtualController
 
                 VirtualController VC = new VirtualController(VirtualController_Port, RobotPorts, DBData, DBSenders);
                 VC.CreateDBSender(DBProcessors_Count);
+                VC.CreateRobots(Robots_Count);
 
             }
             catch (KeyNotFoundException e)
@@ -54,8 +57,12 @@ namespace ru.pflb.VirtualController
                 Console.WriteLine(e);
                 Console.WriteLine("\n\rProperties.txt не найден");
             }
-
-
+            catch (Exception e)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine(e);
+  //              Console.WriteLine("\n\rProperties.txt не найден");
+            }
 
         }
 

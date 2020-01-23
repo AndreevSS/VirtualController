@@ -12,7 +12,13 @@ namespace ru.pflb.VirtualController
 {
     public static class ConnectionHandler
     {
-        
+        public static void PrintKeysAndValues(NameValueCollection myCol)
+        {
+            Console.WriteLine("   KEY        VALUE");
+            foreach (String s in myCol.AllKeys)
+                Console.WriteLine("   {0,-10} {1}", s, myCol[s]);
+            Console.WriteLine();
+        }
         public static NameValueCollection KeysAndValuesFromBody(Stream stream)
         {
 
@@ -22,7 +28,7 @@ namespace ru.pflb.VirtualController
             return BodyCol;
         }
         public static void SimpleTextResponse(HttpListenerContext context, string Answer)
-        {
+        {            
             HttpListenerResponse response = context.Response;
             string ResponseString = Answer;
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(ResponseString);
