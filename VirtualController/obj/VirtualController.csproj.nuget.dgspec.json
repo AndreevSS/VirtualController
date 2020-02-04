@@ -38,6 +38,10 @@
       "frameworks": {
         "netcoreapp3.0": {
           "dependencies": {
+            "InfluxDB.Net-Main": {
+              "target": "Package",
+              "version": "[1.0.47, )"
+            },
             "System.Data.SqlClient": {
               "target": "Package",
               "version": "[4.8.0, )"

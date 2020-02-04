@@ -51,3 +51,10 @@ F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\obj\Debug\n
 F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\VirtualController.csproj.CopyComplete
 F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\ru.pflb.VirtualController.dll
 F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\obj\Debug\netcoreapp3.0\ru.pflb.VirtualController.pdb
+F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\InfluxDB.Net.dll
+F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\Microsoft.Threading.Tasks.Extensions.Desktop.dll
+F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\Microsoft.Threading.Tasks.Extensions.dll
+F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\Microsoft.Threading.Tasks.dll
+F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\System.Net.Http.Extensions.dll
+F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\System.Net.Http.Primitives.dll
+F:\GITPROJECTS\VirtualController\VirtualController\VirtualController\bin\Debug\netcoreapp3.0\Newtonsoft.Json.dll

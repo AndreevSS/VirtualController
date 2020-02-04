@@ -14,6 +14,7 @@ namespace ru.pflb.VirtualController
 {
     public class DBQueueObject
     {
+
         public VirtualRobot VR;
         public String Query;
         public bool needupdate;
@@ -27,12 +28,15 @@ namespace ru.pflb.VirtualController
     }
     public class VirtualController
     {
-
+        InfluxSender influxSender;
         public List<int> RobotPorts;
         public List<DBSender> DBSenders;
 
-        string[] DBData = new string[4];
 
+        string[] DBData = new string[4];
+        string[] InfluxData = new string[4];
+        int HTTP_Threads_Count;
+        int UseBPAResourceUpdater;
         Dictionary<int, VirtualRobot> Robots = new Dictionary<int, VirtualRobot>();
 
         public ArrayList TT = new ArrayList();
@@ -41,27 +45,47 @@ namespace ru.pflb.VirtualController
 
 
         ConcurrentQueue<DBQueueObject> VCQueue = new ConcurrentQueue<DBQueueObject>();
+
+        ConcurrentQueue<DBQueueObject> InfluxQueue = new ConcurrentQueue<DBQueueObject>();
+
         HttpServer server;
 
         int VRCount;
         int VCport;
         bool isCreatingRobots;
 
-        public VirtualController(int VCport, List<int> RobotPorts, string[] DBData, List<DBSender> DBSenders)
+        string BPAPrefix;
+
+        public VirtualController(int VCport, List<int> RobotPorts, string[] DBData, List<DBSender> DBSenders, 
+            int HTTP_Threads_Count, int UseBPAResourceUpdater, string[] InfluxData, string BPAPrefix)
         {
             this.VCport = VCport;
             this.RobotPorts = RobotPorts;
             this.DBSenders = DBSenders;
             this.DBData = DBData;
+            this.InfluxData = InfluxData;
             this.isCreatingRobots = false;
-
+            this.HTTP_Threads_Count = HTTP_Threads_Count;
+            this.UseBPAResourceUpdater = UseBPAResourceUpdater;
+            this.BPAPrefix = BPAPrefix;
             StartServer();
 
             DBQueueObject dBQueueObject = new DBQueueObject(null);
             dBQueueObject.Query = DBQueries.RebuildSessions();
             VCQueue.Enqueue(dBQueueObject);
 
+            CreateInfluxDBSender(1);
+
+            
+
+            DBQueueObject InfluxQueueObject = new DBQueueObject(null);
+            InfluxQueueObject.Query = DBQueries.InsertIntoInflux("200", "1090");
+
+            InfluxQueue.Enqueue(InfluxQueueObject);
+
             //();
+
+            
 
             new Thread(BPAResourceUpdater).Start();
 
@@ -94,11 +118,15 @@ namespace ru.pflb.VirtualController
 
             if (Robots.ContainsKey(context.Request.LocalEndPoint.Port))
             {
+
+                long finish = (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - start);
+                Console.WriteLine("checkporttime: " + finish.ToString());
                 VirtualRobot VR = Robots[context.Request.LocalEndPoint.Port];
                 VR.RobotRequest(context);
             }
 
-            //       Console.WriteLine(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - start);
+
+            
 
         }
 
@@ -134,7 +162,7 @@ namespace ru.pflb.VirtualController
             for (int i = 0; i < VRCount; i++)
             {
                 int port = getFreePort();
-                VirtualRobot VR = new VirtualRobot(port, VCQueue, server);
+                VirtualRobot VR = new VirtualRobot(port, VCQueue, server, BPAPrefix, influxSender);
                 Robots.Add(port, VR);
             }
 
@@ -154,7 +182,7 @@ namespace ru.pflb.VirtualController
 
         public void StartServer()
         {
-            server = new HttpServer(100);
+            server = new HttpServer(HTTP_Threads_Count);
             List<string> prefixes = new List<string>();
 
 
@@ -200,7 +228,7 @@ namespace ru.pflb.VirtualController
         {
             for (int i = 0; i < DBProcessorCount; i++)
             {
-                DBSender DBSender = new DBSender(DBData);
+                DBSender DBSender = new DBSender(DBData, influxSender);
                 DBSenders.Add(DBSender);
 
                 Thread th = new Thread(() =>
@@ -213,9 +241,34 @@ namespace ru.pflb.VirtualController
                 th.Start();
             }
         }
+
+        public void CreateInfluxDBSender(int DBProcessorCount)
+        {
+            Console.WriteLine("creating if");
+            //  for (int i = 0; i < DBProcessorCount; i++)
+            //   {
+            //InfluxSender influxSender= new InfluxSender();
+            //DBSenders.Add(DBSender);
+            influxSender = new InfluxSender(InfluxData[0], InfluxData[1]);
+
+
+            Thread th = new Thread(() =>
+                {
+                    while (true)
+                    {
+                        influxSender.SendPing();
+                        Thread.Sleep(10000);
+                    }
+//                    DBSender.StartSender(InfluxQueue);
+                });
+                th.Name = "Inlfux_Sender" + (DBSenders.Count);
+                Console.WriteLine(th.Name + " created");
+                th.Start();
+         //   }
+        }
         public void BPAResourceUpdater()
         {
-            while (true)
+            while (UseBPAResourceUpdater == 1)
             {
                 try
                 { 
@@ -225,7 +278,7 @@ namespace ru.pflb.VirtualController
                 }
                 catch (Exception e)
                 { Console.WriteLine(e); }
-                Thread.Sleep(10000);
+                Thread.Sleep(20000);
             }
 
         }

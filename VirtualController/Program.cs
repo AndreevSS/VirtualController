@@ -14,15 +14,35 @@ namespace ru.pflb.VirtualController
 
         static void Main(string[] args)
         {
-
+            int UseBPAResourceUpdater = 0;
             int VirtualController_Port = 0;
             int DBProcessors_Count = 0;
             int Robots_Count = 0;
+            int HTTP_Threads_Count = 0;
             int[] VRPorts = new int[2]; //FirstPort, LastPort
             string[] DBData = new string[4]; //"DataSource", "UserID", "Password", "InitialCatalog"
+            string[] InfluxData = new string[4];
+            string EmulName = "";
+            string BPAPrefix = "";
 
             Dictionary<string, string> Properties = new Dictionary<string, string>();
-            
+            /*
+            try
+            {
+                string path = @"log\hlo.log";
+                using (StreamWriter sw = File.AppendText(path))
+                {
+                  
+                        sw.WriteLine("5r5");
+                    
+                }
+             //   System.IO.File.WriteAllText(@"log\hlo.log", "5r5");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            */
             try
             {
                 Properties = (Dictionary<string, string>)ReadDictionaryFile("Properties.txt");
@@ -30,6 +50,8 @@ namespace ru.pflb.VirtualController
                 VirtualController_Port = Convert.ToInt32(Properties["VirtualController_Port"]);
                 DBProcessors_Count = Convert.ToInt32(Properties["DBProcessors_Count"]);
                 Robots_Count = Convert.ToInt32(Properties["Robots_Count"]);
+                HTTP_Threads_Count = Convert.ToInt32(Properties["HTTP_Threads_Count"]);
+                UseBPAResourceUpdater = Convert.ToInt32(Properties["UseBPAResourceUpdater"]);
 
                 VRPorts[0] = Convert.ToInt32(Properties["VirtualRobots_FirstPort"]);
                 VRPorts[1] = Convert.ToInt32(Properties["VirtualRobots_LastPort"]);
@@ -39,10 +61,20 @@ namespace ru.pflb.VirtualController
                 DBData[2] = Properties["Password"];
                 DBData[3] = Properties["InitialCatalog"];
 
+                InfluxData[0] = Properties["DataSourceInflux"];
+                //InfluxData[1] = Properties["UserIDInflux"];
+                InfluxData[1] = Properties["EmulName"];
+                InfluxData[2] = "";
+                InfluxData[3] = "RRtest";
+
+                //EmulName = Properties["EmulName"];
+                BPAPrefix = Properties["BPAPrefix"];
+
                 List<int> RobotPorts = GeneratePorts(VRPorts[0], VRPorts[1]);
                 List<DBSender> DBSenders = new List<DBSender>();
 
-                VirtualController VC = new VirtualController(VirtualController_Port, RobotPorts, DBData, DBSenders);
+                VirtualController VC = new VirtualController(VirtualController_Port, RobotPorts, DBData,
+                    DBSenders, HTTP_Threads_Count, UseBPAResourceUpdater, InfluxData, BPAPrefix);
                 VC.CreateDBSender(DBProcessors_Count);
                 VC.CreateRobots(Robots_Count);
 
@@ -59,9 +91,9 @@ namespace ru.pflb.VirtualController
             }
             catch (Exception e)
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine(e);
-  //              Console.WriteLine("\n\rProperties.txt не найден");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("rerror" + e);
+                //              Console.WriteLine("\n\rProperties.txt не найден");
             }
 
         }

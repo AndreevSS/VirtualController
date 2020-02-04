@@ -103,10 +103,12 @@ namespace ru.pflb.VirtualController
             return RequestString;
         }
 
-        public static string CreateSession(string sessionid, string processid, string userid, int VR_port)
+        public static string CreateSession(string sessionid, string processid, string userid, int VR_port, string BPAPrefix)
         {
 
-            String resourceid = "(select resourceid from BPAResource where name = 'tvsi-rpa0013:" + VR_port.ToString() + "')";
+ //           String resourceid = "(select resourceid from BPAResource where name = 'tvsi-rpa0012:" + VR_port.ToString() + "')";
+
+            String resourceid = "(select resourceid from BPAResource where name = '" + BPAPrefix + ":" + VR_port.ToString() + "')";
             String RequestString = "insert into BPASession(sessionid, startdatetime, processid, starteruserid," +
                                    "runningresourceid, starterresourceid, statusid, starttimezoneoffset, startparamsxml)" +
                                    "values('" + sessionid + "', CURRENT_TIMESTAMP, '" + processid + "','" + userid + "',"
@@ -155,7 +157,8 @@ namespace ru.pflb.VirtualController
         public static string CreateBPAResource(string resourceid, int port)
         {
 
-            string FQDN = "tvsi-rpa0013";
+                  string FQDN = "tvsi-rpa0013";
+            //string FQDN = "tvsi-rpa0012";
             string name = FQDN + ":" + port.ToString();
             FQDN = FQDN + ".delta.sbrf.ru"; // по умолчанию 8181
             String RequestString =
@@ -184,10 +187,11 @@ namespace ru.pflb.VirtualController
 
         }
 
-        public static string UpdateBPAResource(int port, int BPAStatus, int processesrunning)
+        public static string UpdateBPAResource(int port, int BPAStatus, int processesrunning, string BPAPrefix)
         {
 
-            string FQDN = "tvsi-rpa0013";
+            //string FQDN = "tvsi-rpa0012";
+            string FQDN = BPAPrefix;
             string name = FQDN + ":" + port.ToString();
 
 
@@ -222,7 +226,7 @@ namespace ru.pflb.VirtualController
             {
                 RequestString = "update BPAWorkQueueItem " +
                             "set completed = GETUTCDATE(), sessionid = '" + sessionid +
-                            "' where id in (select top (1) id from BPAWorkQueueItem" +
+                            "' where id in (select top (1) id from BPAWorkQueueItem with (updlock)" +
                             " where completed is null" +
                             " and queueid in (select id from bpaworkqueue where name = '" + queuename + "') " +
                             " and ident not in (select queueitemident from bpaworkqueueitemtag) " +
@@ -246,7 +250,7 @@ namespace ru.pflb.VirtualController
 
                 RequestString = "update BPAWorkQueueItem " +
                                  "set completed = GETUTCDATE(), sessionid = '" + sessionid +
-                                 "' where id in (select top (1) id from BPAWorkQueueItem" +
+                                 "' where id in (select top (1) id from BPAWorkQueueItem with (updlock)" +
                                  " left join bpaworkqueueitemtag on bpaworkqueueitem.ident = bpaworkqueueitemtag.queueitemident " +
                                  " where completed is null" +
                                  " and queueid in (select id from bpaworkqueue where name = '" + queuename + "') " +
@@ -277,7 +281,7 @@ namespace ru.pflb.VirtualController
                                  " and ident not in (select id from bpacaselock)" +
                                  " order by loaded asc)";
                                  */
-                queueident = "(select top (1) ident from BPAWorkQueueItem" +
+                queueident = "(select top (1) ident from BPAWorkQueueItem with (updlock)" +
                 " left join bpaworkqueueitemtag on bpaworkqueueitem.ident = bpaworkqueueitemtag.queueitemident " +
                                      " where completed is null" +
                                      " and queueid in (select id from bpaworkqueue where name = '" + queuename + "') " +
@@ -290,15 +294,16 @@ namespace ru.pflb.VirtualController
             }
             else
             {
-                queueident = "(select top (1) ident from BPAWorkQueueItem" +
+                queueident = "(select top (1) ident from BPAWorkQueueItem with (updlock)" +
                                 " where completed is null" +
                                 " and queueid in (select id from bpaworkqueue where name = '" + queuename + "') " +
                                 " and ident not in (select id from bpacaselock)" +
                                 " order by loaded asc)";
             }
 
-            String RequestString = " Insert into BPACaselock (id, locktime, sessionid, lockid) " +
-               "values (" + queueident + ", GETUTCDATE(), + '" + sessionid + "', newid())";
+            String RequestString = "if (" + queueident + "is not null) " +
+                "Insert into BPACaselock (id, locktime, sessionid, lockid) " +
+               "values (" + queueident + ", GETUTCDATE(), '" + sessionid + "', newid())";
 
             return RequestString;
 
@@ -310,6 +315,16 @@ namespace ru.pflb.VirtualController
 
             String RequestString = " delete from BPACaselock " +
                "where sessionid = '" + sessionid + "'";
+
+            return RequestString;
+
+        }
+
+        public static string InsertIntoInflux(string responsetime, string InstanceName)
+        {
+
+            String RequestString = "insert rr, robot_port = " + InstanceName +
+               " response_time = " + responsetime;
 
             return RequestString;
 

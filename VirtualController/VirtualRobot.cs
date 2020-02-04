@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Specialized;
+using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -16,6 +17,8 @@ namespace ru.pflb.VirtualController
         public ConcurrentQueue<DBQueueObject> VCQueue;
 //        public DBQueueObject DBQueueObject;
         public bool dbready;
+
+        public string BPAPrefix;
 
         string bpaqueuename;
         public int port;
@@ -32,7 +35,9 @@ namespace ru.pflb.VirtualController
         string processid = "";
         string tags = "";
 
-        public VirtualRobot(int port, ConcurrentQueue<DBQueueObject> VCQueue, HttpServer server)
+        InfluxSender influxSender;
+
+        public VirtualRobot(int port, ConcurrentQueue<DBQueueObject> VCQueue, HttpServer server, string BPAPrefix, InfluxSender influxSender)
         {
             this.port = port;
             this.id = Guid.NewGuid().ToString();
@@ -42,11 +47,12 @@ namespace ru.pflb.VirtualController
             this.UseBPAQueue = false;
             this.dbready = false;
 
-
+            this.influxSender = influxSender;
+            this.BPAPrefix = BPAPrefix;
 
             DBQueueObject DBQueueObject = new DBQueueObject(this);
             //DBQueueObject.needupdate = true;
-            DBQueueObject.Query = DBQueries.UpdateBPAResource(port, 2, 0);
+            DBQueueObject.Query = DBQueries.UpdateBPAResource(port, 2, 0, BPAPrefix);
             VCQueue.Enqueue(DBQueueObject);
             //  this.DBQueueObject = new DBQueueObject(this);
 
@@ -74,6 +80,8 @@ namespace ru.pflb.VirtualController
                 string pattern = "\\b(.+?)(?(?=(%20.*))(.*)|$)";
 
                 string responseText = "";
+
+                long start = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
                 String RequestTime = DateTime.Now.ToString();
                 Console.WriteLine(RequestTime + " Request: \n" + context.Request.Url);//+ "\n Response: \n" + responseText);
@@ -168,13 +176,8 @@ namespace ru.pflb.VirtualController
 
                                 if (!(groups[1].Value is null))
                                 {
-
                                     tags = groups[1].Value;
-                              /*      if (tag[0] == '-')
-                                    {
-                                        tag = "";
-                                    }
-                              */      
+                                   
                                 }
                                 else
                                 {
@@ -216,14 +219,65 @@ namespace ru.pflb.VirtualController
 
                     Console.WriteLine("db ready");
 
-                    Console.ForegroundColor = ConsoleColor.White;
+                /*    Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine(RequestTime + " Request: \n" + context.Request.Url + "\n" + DateTime.Now + " Response: \n" + responseText);
                     //   ConnectionHandler.PrintKeysAndValues(BodyCol);
                     Console.ForegroundColor = ConsoleColor.Gray;
-                    Thread.Sleep(3);
+                */    Thread.Sleep(3);
 
 
                     ConnectionHandler.SimpleTextResponse(context, responseText);
+                    long ResponseTimeMS = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - start;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    String logline = RequestTime + "\n ResponseTime(ms): " + ResponseTimeMS + "\n" +
+                        " Request: \n" + context.Request.Url + "\n" + DateTime.Now + " Response: \n" + responseText;
+                    Console.WriteLine(logline);
+
+                    influxSender.SendResponseTime(ResponseTimeMS);
+
+                    if (ResponseTimeMS > 10000)
+                    {
+                        Console.WriteLine("!!!!!!!!!!!!!!!! Responsetime > 10000 !!!!!!!!!!!!!!!!!");
+                        /*              try
+                                      {
+                                          string path = @"log\Robot" + port + "_LONG_responseTimes.log";
+                                          using (StreamWriter sw = File.AppendText(path))
+                                          {
+
+                                              sw.WriteLine(logline);
+
+                                          }
+                                          //   System.IO.File.WriteAllText(@"log\hlo.log", "5r5");
+                                      }
+                                      catch (Exception e)
+                                      {
+                                          Console.WriteLine(e);
+                                      }
+
+                                  }
+
+                                  /*try
+                                  {
+                                      string path = @"log\Robot" + port + "_responseTimes.log";
+                                      using (StreamWriter sw = File.AppendText(path))
+                                      {
+
+                                          sw.WriteLine(logline);
+
+                                      }
+                                      //   System.IO.File.WriteAllText(@"log\hlo.log", "5r5");
+                                  }
+                                  catch (Exception e)
+                                  {
+                                      Console.WriteLine(e);
+                                  }
+              */
+                    }
+                    //   ConnectionHandler.PrintKeysAndValues(BodyCol);
+                    Console.ForegroundColor = ConsoleColor.Gray;
+
+
+
 
                     dbready = false;
                     Thread.Sleep(1);
@@ -233,8 +287,8 @@ namespace ru.pflb.VirtualController
 
             catch (Exception e)
             {
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine(e);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("error: " + e);
             }
         }
 
@@ -282,7 +336,7 @@ namespace ru.pflb.VirtualController
             DBQueueObject DBQueueObject = new DBQueueObject(this);
 
 
-            DBQueueObject.Query = DBQueries.CreateSession(sessionid, processid, userid, port);
+            DBQueueObject.Query = DBQueries.CreateSession(sessionid, processid, userid, port, BPAPrefix);
 
             DBQueueObject.needupdate = true;
 
@@ -363,7 +417,6 @@ namespace ru.pflb.VirtualController
                    "USER AUTHENTICATED\r\n" +
                    "no\r\n" +
                    "SESSION DELETED : " + sessionid;
-
         }
 
     }
