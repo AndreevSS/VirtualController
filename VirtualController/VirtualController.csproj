@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="InfluxDB.Net-Main" Version="1.0.47" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
   </ItemGroup>
 
 </Project>
